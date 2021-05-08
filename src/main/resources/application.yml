@@ -1,0 +1,32 @@
+spring:
+  datasource:
+    url: jdbc:mariadb://localhost:3307/dev_in
+    username: root
+    password: admin
+    driver-class-name: org.mariadb.jdbc.Driver
+
+  thymeleaf:
+    prefix: classpath:templates/
+    suffix: .html
+    cache: false
+  jpa:
+    hibernate:
+      ddl-auto: create
+    open-in-view: true
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        default_batch_fetch_size: 100
+
+  data:
+    web:
+      pageable:
+        default-page-size: 10
+        max-page-size: 2000
+        one-indexed-parameters: true
+
+logging.level:
+  org.hibernate.SQL: debug
+  org.hibernate.type: trace
+
