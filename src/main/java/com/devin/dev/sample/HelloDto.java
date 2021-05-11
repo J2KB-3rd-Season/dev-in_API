@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class HelloDTO {
+public class HelloDto {
     private Long id;
     private String data;
 }

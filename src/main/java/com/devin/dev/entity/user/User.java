@@ -47,16 +47,16 @@ public class User extends Created {
     @OneToMany(mappedBy = "user")
     List<UserSNS> sns = new ArrayList<>();
 
-    String name;
-    String email;
-    String password;
-    String phone_number;
-    Long exp;
-    String profile;
+    private String name;
+    private String email;
+    private String password;
+    private String phone_number;
+    private Long exp;
+    private String profile;
 
     @Enumerated
-    UserStatus status;
+    private UserStatus status;
 
-    String sns_type;
+    private String sns_type;
 
 }
