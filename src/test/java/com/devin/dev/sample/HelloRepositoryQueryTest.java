@@ -8,20 +8,20 @@ import org.springframework.boot.test.context.SpringBootTest;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
-
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class HelloRepositoryTest {
+class HelloRepositoryQueryTest {
 
     @PersistenceContext
     EntityManager em;
 
     @Autowired
-    HelloJpaRepository helloJpaRepository;
+    HelloRepository helloRepository;
 
     @BeforeEach
     public void initData() {
@@ -38,7 +38,7 @@ class HelloRepositoryTest {
 
     @Test
     public void findAll() {
-        List<Hello> allHello = helloJpaRepository.findAll();
+        List<Hello> allHello = helloRepository.findAllCustom();
         assertThat(allHello)
                 .extracting("data")
                 .containsExactly("a", "b", "c", "d");
@@ -49,26 +49,15 @@ class HelloRepositoryTest {
         Hello e = new Hello("e");
         em.persist(e);
 
-        Hello findHello = helloJpaRepository.findById(e.getId()).get();
+        Hello findHello = helloRepository.findByIdCustom(e.getId()).get();
         assertThat(findHello).isEqualTo(e);
     }
 
     @Test
-    public void save() {
-        Hello e = new Hello("e");
+    public void count() {
+        long count = helloRepository.countCustom();
 
-        helloJpaRepository.save(e);
-
-        Hello findHello = em.find(Hello.class, e.getId());
-        assertThat(findHello).isEqualTo(e);
+        assertThat(count).isEqualTo(4L);
     }
 
-    @Test
-    public void deleteOne() {
-        Hello e = new Hello("e");
-        em.persist(e);
-
-        helloJpaRepository.delete(e);
-        assertThat(em.find(Hello.class, e.getId())).isNull();
-    }
 }

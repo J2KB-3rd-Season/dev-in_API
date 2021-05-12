@@ -2,20 +2,19 @@ package com.devin.dev.repository;
 
 import com.devin.dev.entity.user.User;
 import com.devin.dev.entity.user.UserStatus;
-import org.assertj.core.api.Assertions;
+import com.devin.dev.repository.user.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -49,6 +48,16 @@ class UserRepositoryTest {
     }
 
     @Test
+    void findByName() {
+        User user = new User("A", "a@b.com", "pass", "0000", UserStatus.ACTIVE);
+        em.persist(user);
+
+        User findUser = userRepository.findByName("A").get();
+
+        assertThat(user).isEqualTo(findUser);
+    }
+
+    @Test
     void deleteOne() {
         User user = new User("A", "a@b.com", "pass", "0000", UserStatus.ACTIVE);
         em.persist(user);
@@ -74,4 +83,6 @@ class UserRepositoryTest {
         assertThat(allUsers.size()).isEqualTo(4);
         assertThat(allUsers).extracting("name").containsExactly("A", "B", "C", "D");
     }
+
+
 }

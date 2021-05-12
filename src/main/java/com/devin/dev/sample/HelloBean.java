@@ -9,8 +9,4 @@ import javax.persistence.EntityManager;
 @Configuration
 public class HelloBean {
 
-    @Bean
-    JPAQueryFactory jpaQueryFactory(EntityManager em) {
-        return new JPAQueryFactory(em);
-    }
 }

@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,10 +38,18 @@ public class Post extends ModifiedCreated {
     @OneToMany(mappedBy = "post")
     List<PostImage> images = new ArrayList<>();
 
+    @NotNull
     String title;
+
+    @NotNull
     String content;
 
     @Enumerated
-    PostState state;
+    PostState state = PostState.VIEWABLE;
 
+    public Post(User user, String title, String content) {
+        this.user = user;
+        this.title = title;
+        this.content = content;
+    }
 }
