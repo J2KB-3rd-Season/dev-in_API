@@ -13,7 +13,7 @@ import javax.validation.constraints.NotEmpty;
 public class PostImage {
     @Id
     @GeneratedValue
-    @Column(name = "image_id")
+    @Column(name = "post_image_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

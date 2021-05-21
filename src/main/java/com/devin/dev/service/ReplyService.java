@@ -25,6 +25,7 @@ public class ReplyService {
     private final ReplyRepository replyRepository;
     private final ReplyImageRepository replyImageRepository;
 
+    // 답변 작성
     @Transactional
     public Long reply(Long userId, Long postId, String content, List<String> imagePaths) throws IllegalArgumentException {
         // 엔티티 조회. 실패시 IllegalArgumentException
@@ -45,6 +46,18 @@ public class ReplyService {
         return reply.getId();
     }
 
+    // 답변 수정
+    @Transactional
+    public Long editReply(Long userId, Long replyId, String content, List<String> imagePaths) {
+        // 엔티티 조회. 실패시 IllegalArgumentException
+        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유저 조회 실패"));
+        Reply reply = replyRepository.findById(replyId).orElseThrow(() -> new IllegalArgumentException("답변 조회 실패"));
+
+        return 0L;
+//        Reply.setReplyImages();
+    }
+
+    // 좋아요 상태변경
     @Transactional
     public Long changeReplyLike(Long userId, Long replyId) throws IllegalArgumentException {
         // 엔티티 조회

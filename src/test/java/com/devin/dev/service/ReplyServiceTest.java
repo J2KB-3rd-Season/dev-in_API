@@ -58,7 +58,6 @@ class ReplyServiceTest {
     }
 
     @Test
-    @Rollback(false)
     void replyLikeTest() {
         User postUser = new User("D", "d@b.com", "passD", "0004", UserStatus.ACTIVE);
         User replyUser = new User("E", "e@b.com", "passE", "0005", UserStatus.ACTIVE);
@@ -88,7 +87,6 @@ class ReplyServiceTest {
     }
 
     @Test
-    @Rollback(false)
     void replyCancelLikeTest() {
         User postUser = new User("D", "d@b.com", "passD", "0004", UserStatus.ACTIVE);
         User replyUser = new User("E", "e@b.com", "passE", "0005", UserStatus.ACTIVE);
@@ -128,4 +126,6 @@ class ReplyServiceTest {
         assertThat(replyUser.getExp()).isEqualTo(2);
 
     }
+
+
 }

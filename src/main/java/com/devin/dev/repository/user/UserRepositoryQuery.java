@@ -8,6 +8,6 @@ public interface UserRepositoryQuery {
 
     List<User> findUsers();
 
-
+    
 
 }

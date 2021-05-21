@@ -23,12 +23,12 @@ public class Reply extends ModifiedCreated {
     private Long id;
 
     @Setter
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
 
     @Setter
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -55,7 +55,7 @@ public class Reply extends ModifiedCreated {
         return reply;
     }
 
-    public static void setReplyImage(Reply reply, ReplyImage replyImage) {
+    private static void setReplyImage(Reply reply, ReplyImage replyImage) {
         reply.images.add(replyImage);
         replyImage.setReply(reply);
     }
@@ -67,11 +67,15 @@ public class Reply extends ModifiedCreated {
         reply.setContent(content);
         reply.setState(ReplyState.VIEWABLE);
 
+        setReplyImages(images, reply);
+
+        return reply;
+    }
+
+    public static void setReplyImages(List<ReplyImage> images, Reply reply) {
         for (ReplyImage image : images) {
             setReplyImage(reply, image);
         }
-
-        return reply;
     }
 
     public ReplyLike like(User user, ReplyLike replyLike) {
