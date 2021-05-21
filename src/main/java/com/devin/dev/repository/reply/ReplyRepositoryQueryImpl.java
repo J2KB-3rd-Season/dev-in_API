@@ -3,12 +3,15 @@ package com.devin.dev.repository.reply;
 import com.devin.dev.dto.QReplyLikeDto;
 import com.devin.dev.dto.ReplyLikeDto;
 import com.devin.dev.entity.post.Post;
+import com.devin.dev.entity.reply.QReplyLike;
 import com.devin.dev.entity.reply.Reply;
+import com.devin.dev.entity.reply.ReplyLike;
 import com.devin.dev.entity.user.User;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,6 +22,8 @@ import static com.devin.dev.entity.reply.QReplyLike.replyLike;
 public class ReplyRepositoryQueryImpl implements ReplyRepositoryQuery {
 
     private final JPAQueryFactory queryFactory;
+
+    private final EntityManager em;
 
     @Override
     public List<Reply> findReplyPageByPost(Post post, Pageable pageable) {
@@ -36,23 +41,27 @@ public class ReplyRepositoryQueryImpl implements ReplyRepositoryQuery {
 //        Expressions.asBoolean(true).isTrue() : BooleanExpression 값 설정
         return Optional.ofNullable(queryFactory
                 .select(new QReplyLikeDto(
-                        reply.id.as("replyId"),
-                        replyLike.user.id.as("userId"),
+                        reply.id,
+                        replyLike.id,
+                        replyLike.user.id,
                         replyLike.user.name.as("username")
                 ))
                 .from(reply)
                 .leftJoin(reply.likes, replyLike)
-                .where(reply.user.eq(user)
-                .and(reply.id.eq(replyId)))
-                .fetchFirst());
+                .where(
+                        replyLike.user.eq(user),
+                        reply.id.eq(replyId)
+                )
+                .fetchOne());
     }
 
     @Override
     public List<ReplyLikeDto> findReplyLikesById(Long replyId) {
         return queryFactory
                 .select(new QReplyLikeDto(
-                        reply.id.as("replyId"),
-                        replyLike.user.id.as("userId"),
+                        reply.id,
+                        replyLike.id,
+                        replyLike.user.id,
                         replyLike.user.name.as("username")
                 ))
                 .from(reply)
@@ -68,6 +77,27 @@ public class ReplyRepositoryQueryImpl implements ReplyRepositoryQuery {
                 .from(reply)
                 .where(reply.id.eq(replyId))
                 .fetchCount();
+    }
+
+    @Override
+    public Optional<ReplyLike> findReplyLikeByLikeId(Long replyLikeId) {
+        return Optional.ofNullable(queryFactory
+                .select(replyLike)
+                .from(replyLike)
+                .where(replyLike.id.eq(replyLikeId))
+                .fetchOne());
+    }
+
+    @Override
+    public boolean deleteByReplyLikeId(Long replyLikeId) {
+        ReplyLike replyLike = queryFactory
+                .selectFrom(QReplyLike.replyLike)
+                .where(QReplyLike.replyLike.id.eq(replyLikeId))
+                .fetchOne();
+
+        em.remove(replyLike);
+
+        return true;
     }
 
 

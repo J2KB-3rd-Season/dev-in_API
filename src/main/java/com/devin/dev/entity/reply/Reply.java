@@ -80,7 +80,7 @@ public class Reply extends ModifiedCreated {
         replyLike.setUser(user);
     }
 
-    public void cancelLike(User user, ReplyLike replyLike) {
+    public void cancelLike(ReplyLike replyLike) {
         this.likes.remove(replyLike);
     }
 }

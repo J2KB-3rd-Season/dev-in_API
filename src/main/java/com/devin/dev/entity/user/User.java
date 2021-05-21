@@ -64,32 +64,36 @@ public class User extends Created {
         this.exp = 0L;
     }
 
-    public void addExp(ExpIncreaseType type) {
-        this.exp += type.getIncrease();
+    public void changeExp(ExpChangeType type) {
+        this.exp += type.getChange();
     }
 
-    public void subExp(ExpIncreaseType type) {
-        this.exp += type.getIncrease();
-    }
-
-    public enum ExpIncreaseType {
-        POST(1),
-        REPLY(3),
-        POST_LIKE_WRITER(1),
+    public enum ExpChangeType {
+        CREATE_POST(1),
+        CREATE_REPLY(3),
+        POST_BE_LIKED(1),
         POST_LIKE(1),
-        REPLY_LIKE_WRITER(1),
+        REPLY_BE_LIKED(1),
         REPLY_LIKE(1),
         REPLY_SELECT(5),
-        REPLY_SELECT_WRITER(10);
+        REPLY_BE_SELECTED(10),
+        DELETE_POST(-1),
+        DELETE_REPLY(-3),
+        POST_NOT_BE_LIKED(-1),
+        POST_CANCEL_LIKE(-1),
+        REPLY_NOT_BE_LIKED(-1),
+        REPLY_CANCEL_LIKE(-1),
+        REPLY_CANCEL_SELECT(-5),
+        REPLY_NOT_BE_SELECTED(-10);
 
-        private final int increase;
+        private final int change;
 
-        ExpIncreaseType(int increase) {
-            this.increase = increase;
+        ExpChangeType(int change) {
+            this.change = change;
         }
 
-        public int getIncrease() {
-            return increase;
+        public int getChange() {
+            return change;
         }
     }
 

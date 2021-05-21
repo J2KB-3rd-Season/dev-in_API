@@ -210,23 +210,25 @@ class ReplyRepositoryTest {
         em.persist(reply);
 
         Optional<ReplyLikeDto> like1 = replyRepository.findReplyLikeByReplyAndUser(reply.getId(), replyLikeUser1);
-        Optional<ReplyLikeDto> like2 = replyRepository.findReplyLikeByReplyAndUser(reply.getId(), replyLikeUser2);
-        Optional<ReplyLikeDto> like3 = replyRepository.findReplyLikeByReplyAndUser(reply.getId(), replyLikeUser3);
-        Optional<ReplyLikeDto> like4 = replyRepository.findReplyLikeByReplyAndUser(reply.getId(), replyLikeUser4);
         Optional<ReplyLikeDto> like5 = replyRepository.findReplyLikeByReplyAndUser(reply.getId(), postUser);
 
-        System.out.println("like5.isPresent() = " + like5.isPresent());
+        assertThat(like1.get().getUsername()).isEqualTo("L1");
+        assertThat(like5).isEmpty();
 
         List<ReplyLikeDto> replyLikes = replyRepository.findReplyLikesById(reply.getId());
 
-        System.out.println("replyLikes = " + replyLikes);
-
         assertThat(replyLikes.size()).isEqualTo(4);
         assertThat(replyLikes).extracting("username")
-                .containsExactly(replyLikeUser1.getName(), replyLikeUser2.getName(), replyLikeUser3.getName(), replyLikeUser4.getName());
+                .containsExactly(
+                        replyLikeUser1.getName(),
+                        replyLikeUser2.getName(),
+                        replyLikeUser3.getName(),
+                        replyLikeUser4.getName()
+                );
     }
 
     @Test
+    @Rollback(false)
     void replyCancelLike() {
         User postUser = new User("D", "d@b.com", "passD", "0004", UserStatus.ACTIVE);
         User replyUser = new User("E", "e@b.com", "passE", "0005", UserStatus.ACTIVE);
@@ -236,19 +238,64 @@ class ReplyRepositoryTest {
         User replyLikeUser4 = new User("L4", "l4@b.com", "passL4", "0009", UserStatus.ACTIVE);
         Post post1 = new Post(postUser, "PostC1", "ContentC1");
         em.persist(postUser);
-        em.persist(post1);
         em.persist(replyUser);
+        em.persist(replyLikeUser1);
+        em.persist(replyLikeUser2);
+        em.persist(replyLikeUser3);
+        em.persist(replyLikeUser4);
+        em.persist(post1);
 
         Reply reply = Reply.createReply(post1, replyUser, "reply_content");
+
+        ReplyLike replyLike1 = new ReplyLike();
+        ReplyLike replyLike2 = new ReplyLike();
+        ReplyLike replyLike3 = new ReplyLike();
+        ReplyLike replyLike4 = new ReplyLike();
+
+        reply.like(replyLikeUser1, replyLike1);
+        reply.like(replyLikeUser2, replyLike2);
+        reply.like(replyLikeUser3, replyLike3);
+        reply.like(replyLikeUser4, replyLike4);
+        em.persist(replyLike1);
+        em.persist(replyLike2);
+        em.persist(replyLike3);
+        em.persist(replyLike4);
         em.persist(reply);
 
-        reply.like(replyLikeUser1, new ReplyLike());
-        reply.like(replyLikeUser2, new ReplyLike());
-        reply.like(replyLikeUser3, new ReplyLike());
-        reply.like(replyLikeUser4, new ReplyLike());
+        Optional<ReplyLikeDto> like1 = replyRepository.findReplyLikeByReplyAndUser(reply.getId(), replyLikeUser1);
+        Optional<ReplyLikeDto> like5 = replyRepository.findReplyLikeByReplyAndUser(reply.getId(), postUser);
 
-        assertThat(reply.getLikes().size()).isEqualTo(4);
-        assertThat(reply.getLikes()).extracting("user")
-                .containsExactly(replyLikeUser1, replyLikeUser2, replyLikeUser3, replyLikeUser4);
+        assertThat(like1.get().getUsername()).isEqualTo("L1");
+        assertThat(like5).isEmpty();
+
+        List<ReplyLikeDto> replyLikes = replyRepository.findReplyLikesById(reply.getId());
+
+        // 기존 좋아요 4개
+        assertThat(replyLikes.size()).isEqualTo(4);
+        assertThat(replyLikes).extracting("username")
+                .containsExactly(
+                        replyLikeUser1.getName(),
+                        replyLikeUser2.getName(),
+                        replyLikeUser3.getName(),
+                        replyLikeUser4.getName()
+                );
+
+        ReplyLike replyLike = replyRepository.findReplyLikeByLikeId(like1.get().getLikeId()).get();
+
+        // 하나 지우면
+        replyRepository.deleteByReplyLikeId(replyLike.getId());
+
+        like1 = replyRepository.findReplyLikeByReplyAndUser(reply.getId(), replyLikeUser1);
+        assertThat(like1).isEmpty();
+
+        // 3개가 됨
+        replyLikes = replyRepository.findReplyLikesById(reply.getId());
+        assertThat(replyLikes.size()).isEqualTo(3);
+        assertThat(replyLikes).extracting("username")
+                .containsExactly(
+                        replyLikeUser2.getName(),
+                        replyLikeUser3.getName(),
+                        replyLikeUser4.getName()
+                );
     }
 }

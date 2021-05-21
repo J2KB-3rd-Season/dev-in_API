@@ -35,7 +35,7 @@ public class ReplyService {
         Reply reply = Reply.createReplyWithImages(post, user, replyImages, content);
 
         // 리플 작성자 경험치증가
-        user.addExp(User.ExpIncreaseType.REPLY);
+        user.changeExp(User.ExpChangeType.CREATE_REPLY);
 
         // 저장
         replyRepository.save(reply);
