@@ -50,7 +50,7 @@ public class User extends Created {
     private Long exp;
     private String profile;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private UserStatus status;
 
     private String sns_type;

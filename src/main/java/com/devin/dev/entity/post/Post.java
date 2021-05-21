@@ -44,7 +44,7 @@ public class Post extends ModifiedCreated {
     @NotNull
     private String content;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private PostState state;
 
     public Post(User user, String title, String content) {

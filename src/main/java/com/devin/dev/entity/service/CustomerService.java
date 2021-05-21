@@ -22,12 +22,12 @@ public class CustomerService extends Created {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Enumerated
-    private  ServiceType type;
+    @Enumerated(EnumType.STRING)
+    private ServiceType type;
 
     private String title;
     private String content;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private ServiceState status;
 }

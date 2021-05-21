@@ -6,6 +6,7 @@ import com.devin.dev.entity.user.User;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -21,10 +22,12 @@ public class Reply extends ModifiedCreated {
     @Column(name = "reply_id")
     private Long id;
 
+    @Setter
     @ManyToOne
     @JoinColumn(name = "post_id")
     private Post post;
 
+    @Setter
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -35,26 +38,12 @@ public class Reply extends ModifiedCreated {
     @OneToMany(mappedBy = "reply")
     private final List<ReplyImage> images = new ArrayList<>();
 
+    @Setter
     private String content;
 
-    @Enumerated
+    @Setter
+    @Enumerated(EnumType.STRING)
     private ReplyState state;
-
-    private void setPost(Post post) {
-        this.post = post;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public void setState(ReplyState state) {
-        this.state = state;
-    }
 
     public static Reply createReply(Post post, User user, String content) {
         Reply reply = new Reply();
@@ -83,5 +72,15 @@ public class Reply extends ModifiedCreated {
         }
 
         return reply;
+    }
+
+    public void like(User user, ReplyLike replyLike) {
+        this.likes.add(replyLike);
+        replyLike.setReply(this);
+        replyLike.setUser(user);
+    }
+
+    public void cancelLike(User user, ReplyLike replyLike) {
+        this.likes.remove(replyLike);
     }
 }

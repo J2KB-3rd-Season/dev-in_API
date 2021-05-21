@@ -1,8 +1,10 @@
 package com.devin.dev.repository;
 
+import com.devin.dev.dto.ReplyLikeDto;
 import com.devin.dev.entity.post.Post;
 import com.devin.dev.entity.reply.Reply;
 import com.devin.dev.entity.reply.ReplyImage;
+import com.devin.dev.entity.reply.ReplyLike;
 import com.devin.dev.entity.user.User;
 import com.devin.dev.entity.user.UserStatus;
 import com.devin.dev.repository.post.PostRepository;
@@ -17,6 +19,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.annotation.Rollback;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -46,42 +49,42 @@ class ReplyRepositoryTest {
 
     @BeforeEach
     void setDummyData() {
-        User userA = new User("A", "a@b.com", "passA", "0001", UserStatus.ACTIVE);
-        Post postA1 = new Post(userA, "PostA1", "ContentA1");
-        Post postA2 = new Post(userA, "PostA2", "ContentA2");
-        userA.getPosts().add(postA1);
-        userA.getPosts().add(postA2);
-        em.persist(postA1);
-        em.persist(postA2);
-        em.persist(userA);
-
-
-        User userB = new User("B", "b@b.com", "passB", "0002", UserStatus.DELETED);
-        Post postB1 = new Post(userB, "PostB1", "ContentB1");
-        Post postB2 = new Post(userB, "PostB2", "ContentB2");
-        Post postB3 = new Post(userB, "PostB3", "ContentB3");
-        Post postB4 = new Post(userB, "PostB4", "ContentB4");
-        userB.getPosts().add(postB1);
-        userB.getPosts().add(postB2);
-        userB.getPosts().add(postB3);
-        userB.getPosts().add(postB4);
-        em.persist(postB1);
-        em.persist(postB2);
-        em.persist(postB3);
-        em.persist(postB4);
-        em.persist(userB);
-
-
-        User userC = new User("C", "c@b.com", "passC", "0003", UserStatus.DORMANT);
-        Post postC1 = new Post(userC, "PostC1", "ContentC1");
-        Post postC2 = new Post(userC, "PostC2", "ContentC2");
-        Post postC3 = new Post(userC, "PostC3", "ContentC3");
-        userC.getPosts().add(postC1);
-        userC.getPosts().add(postC2);
-        userC.getPosts().add(postC3);
-        em.persist(postC1);
-        em.persist(postC2);
-        em.persist(userC);
+//        User userA = new User("A", "a@b.com", "passA", "0001", UserStatus.ACTIVE);
+//        Post postA1 = new Post(userA, "PostA1", "ContentA1");
+//        Post postA2 = new Post(userA, "PostA2", "ContentA2");
+//        userA.getPosts().add(postA1);
+//        userA.getPosts().add(postA2);
+//        em.persist(postA1);
+//        em.persist(postA2);
+//        em.persist(userA);
+//
+//
+//        User userB = new User("B", "b@b.com", "passB", "0002", UserStatus.DELETED);
+//        Post postB1 = new Post(userB, "PostB1", "ContentB1");
+//        Post postB2 = new Post(userB, "PostB2", "ContentB2");
+//        Post postB3 = new Post(userB, "PostB3", "ContentB3");
+//        Post postB4 = new Post(userB, "PostB4", "ContentB4");
+//        userB.getPosts().add(postB1);
+//        userB.getPosts().add(postB2);
+//        userB.getPosts().add(postB3);
+//        userB.getPosts().add(postB4);
+//        em.persist(postB1);
+//        em.persist(postB2);
+//        em.persist(postB3);
+//        em.persist(postB4);
+//        em.persist(userB);
+//
+//
+//        User userC = new User("C", "c@b.com", "passC", "0003", UserStatus.DORMANT);
+//        Post postC1 = new Post(userC, "PostC1", "ContentC1");
+//        Post postC2 = new Post(userC, "PostC2", "ContentC2");
+//        Post postC3 = new Post(userC, "PostC3", "ContentC3");
+//        userC.getPosts().add(postC1);
+//        userC.getPosts().add(postC2);
+//        userC.getPosts().add(postC3);
+//        em.persist(postC1);
+//        em.persist(postC2);
+//        em.persist(userC);
 
     }
 
@@ -171,4 +174,81 @@ class ReplyRepositoryTest {
         assertThat(foundReply.getContent()).isEqualTo("reply_content");
     }
 
+    @Test
+    @Rollback(false)
+    void replyLike() {
+        User postUser = new User("D", "d@b.com", "passD", "0004", UserStatus.ACTIVE);
+        User replyUser = new User("E", "e@b.com", "passE", "0005", UserStatus.ACTIVE);
+        User replyLikeUser1 = new User("L1", "l1@b.com", "passL1", "0006", UserStatus.ACTIVE);
+        User replyLikeUser2 = new User("L2", "l2@b.com", "passL2", "0007", UserStatus.ACTIVE);
+        User replyLikeUser3 = new User("L3", "l3@b.com", "passL3", "0008", UserStatus.ACTIVE);
+        User replyLikeUser4 = new User("L4", "l4@b.com", "passL4", "0009", UserStatus.ACTIVE);
+        Post post1 = new Post(postUser, "PostC1", "ContentC1");
+        em.persist(postUser);
+        em.persist(replyUser);
+        em.persist(replyLikeUser1);
+        em.persist(replyLikeUser2);
+        em.persist(replyLikeUser3);
+        em.persist(replyLikeUser4);
+        em.persist(post1);
+
+        Reply reply = Reply.createReply(post1, replyUser, "reply_content");
+
+        ReplyLike replyLike1 = new ReplyLike();
+        ReplyLike replyLike2 = new ReplyLike();
+        ReplyLike replyLike3 = new ReplyLike();
+        ReplyLike replyLike4 = new ReplyLike();
+
+        reply.like(replyLikeUser1, replyLike1);
+        reply.like(replyLikeUser2, replyLike2);
+        reply.like(replyLikeUser3, replyLike3);
+        reply.like(replyLikeUser4, replyLike4);
+        em.persist(replyLike1);
+        em.persist(replyLike2);
+        em.persist(replyLike3);
+        em.persist(replyLike4);
+        em.persist(reply);
+
+        Optional<ReplyLikeDto> like1 = replyRepository.findReplyLikeByReplyAndUser(reply.getId(), replyLikeUser1);
+        Optional<ReplyLikeDto> like2 = replyRepository.findReplyLikeByReplyAndUser(reply.getId(), replyLikeUser2);
+        Optional<ReplyLikeDto> like3 = replyRepository.findReplyLikeByReplyAndUser(reply.getId(), replyLikeUser3);
+        Optional<ReplyLikeDto> like4 = replyRepository.findReplyLikeByReplyAndUser(reply.getId(), replyLikeUser4);
+        Optional<ReplyLikeDto> like5 = replyRepository.findReplyLikeByReplyAndUser(reply.getId(), postUser);
+
+        System.out.println("like5.isPresent() = " + like5.isPresent());
+
+        List<ReplyLikeDto> replyLikes = replyRepository.findReplyLikesById(reply.getId());
+
+        System.out.println("replyLikes = " + replyLikes);
+
+        assertThat(replyLikes.size()).isEqualTo(4);
+        assertThat(replyLikes).extracting("username")
+                .containsExactly(replyLikeUser1.getName(), replyLikeUser2.getName(), replyLikeUser3.getName(), replyLikeUser4.getName());
+    }
+
+    @Test
+    void replyCancelLike() {
+        User postUser = new User("D", "d@b.com", "passD", "0004", UserStatus.ACTIVE);
+        User replyUser = new User("E", "e@b.com", "passE", "0005", UserStatus.ACTIVE);
+        User replyLikeUser1 = new User("L1", "l1@b.com", "passL1", "0006", UserStatus.ACTIVE);
+        User replyLikeUser2 = new User("L2", "l2@b.com", "passL2", "0007", UserStatus.ACTIVE);
+        User replyLikeUser3 = new User("L3", "l3@b.com", "passL3", "0008", UserStatus.ACTIVE);
+        User replyLikeUser4 = new User("L4", "l4@b.com", "passL4", "0009", UserStatus.ACTIVE);
+        Post post1 = new Post(postUser, "PostC1", "ContentC1");
+        em.persist(postUser);
+        em.persist(post1);
+        em.persist(replyUser);
+
+        Reply reply = Reply.createReply(post1, replyUser, "reply_content");
+        em.persist(reply);
+
+        reply.like(replyLikeUser1, new ReplyLike());
+        reply.like(replyLikeUser2, new ReplyLike());
+        reply.like(replyLikeUser3, new ReplyLike());
+        reply.like(replyLikeUser4, new ReplyLike());
+
+        assertThat(reply.getLikes().size()).isEqualTo(4);
+        assertThat(reply.getLikes()).extracting("user")
+                .containsExactly(replyLikeUser1, replyLikeUser2, replyLikeUser3, replyLikeUser4);
+    }
 }
