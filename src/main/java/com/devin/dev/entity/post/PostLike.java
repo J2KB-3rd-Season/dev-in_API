@@ -15,10 +15,10 @@ public class PostLike extends Created {
     @Id
     @GeneratedValue
     @Column(name = "post_like_id")
-    Long id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "post_id")
-    Post post;
+    private Post post;
 
 }

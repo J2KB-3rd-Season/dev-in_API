@@ -20,32 +20,32 @@ public class Post extends ModifiedCreated {
     @Id
     @GeneratedValue
     @Column(name = "post_id")
-    Long id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    User user;
+    private User user;
 
     @OneToMany(mappedBy = "post")
-    List<Reply> replies = new ArrayList<>();
+    private final List<Reply> replies = new ArrayList<>();
 
     @OneToMany(mappedBy = "post")
-    List<PostTag> tags = new ArrayList<>();
+    private final List<PostTag> tags = new ArrayList<>();
 
     @OneToMany(mappedBy = "post")
-    List<PostLike> likes = new ArrayList<>();
+    private final List<PostLike> likes = new ArrayList<>();
 
     @OneToMany(mappedBy = "post")
-    List<PostImage> images = new ArrayList<>();
+    private final List<PostImage> images = new ArrayList<>();
 
     @NotNull
-    String title;
+    private  String title;
 
     @NotNull
-    String content;
+    private String content;
 
     @Enumerated
-    PostState state = PostState.VIEWABLE;
+    private PostState state;
 
     public Post(User user, String title, String content) {
         this.user = user;

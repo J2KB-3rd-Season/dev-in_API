@@ -16,18 +16,18 @@ public class CustomerService extends Created {
     @Id
     @GeneratedValue
     @Column(name = "service_id")
-    Long id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    User user;
+    private User user;
 
     @Enumerated
-    ServiceType type;
+    private  ServiceType type;
 
-    String title;
-    String content;
+    private String title;
+    private String content;
 
     @Enumerated
-    ServiceState status;
+    private ServiceState status;
 }

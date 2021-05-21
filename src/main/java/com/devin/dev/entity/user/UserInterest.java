@@ -17,13 +17,13 @@ public class UserInterest {
     @Id
     @GeneratedValue
     @Column(name = "interest_id")
-    Long id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "subject_id")
-    Subject interest;
+    private Subject interest;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    User user;
+    private User user;
 }

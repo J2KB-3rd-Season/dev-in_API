@@ -14,14 +14,14 @@ public class PostTag {
     @Id
     @GeneratedValue
     @Column(name = "post_tag_id")
-    Long id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "subject_id")
-    Subject tag;
+    private Subject tag;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
-    Post post;
+    private Post post;
 
 }

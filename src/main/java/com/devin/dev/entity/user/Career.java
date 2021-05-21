@@ -15,15 +15,15 @@ public class Career {
     @Id
     @GeneratedValue
     @Column(name = "career_id")
-    Long id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    User user;
+    private User user;
 
-    String company;
-    String department;
+    private String company;
+    private String department;
 
-    LocalDateTime startTime;
-    LocalDateTime endTime;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
 }

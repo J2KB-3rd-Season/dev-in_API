@@ -15,15 +15,15 @@ public class Education {
     @Id
     @GeneratedValue
     @Column(name = "education_id")
-    Long id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    User user;
+    private User user;
 
-    String name;
-    String major;
+    private String name;
+    private String major;
 
-    LocalDateTime startTime;
-    LocalDateTime endTime;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
 }

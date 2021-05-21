@@ -8,6 +8,7 @@ import com.devin.dev.entity.user.User;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,6 +20,7 @@ public class PostRepositoryQueryImpl implements PostRepositoryQuery {
     private final JPAQueryFactory queryFactory;
 
     @Override
+    @Transactional
     public List<String> findPostnameByUser(User user) {
         return queryFactory
                 .select(post.title)

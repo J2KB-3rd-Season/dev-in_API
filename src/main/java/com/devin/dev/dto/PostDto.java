@@ -6,8 +6,8 @@ import lombok.Data;
 @Data
 public class PostDto {
 
-    String title;
-    String content;
+    private String title;
+    private String content;
 
     @QueryProjection
     public PostDto(String title, String content) {

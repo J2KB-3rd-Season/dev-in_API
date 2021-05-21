@@ -15,9 +15,9 @@ public class ReplyLike extends Created {
     @Id
     @GeneratedValue
     @Column(name = "like_id")
-    Long id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reply_id")
-    Reply reply;
+    private Reply reply;
 }

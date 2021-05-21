@@ -1,4 +1,4 @@
 package com.devin.dev.dto;
 
-public class ReplyDto {
+public class ReplyPostDto {
 }

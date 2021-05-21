@@ -17,16 +17,16 @@ public class ModifiedCreated {
 
     @CreatedDate
     @Column(updatable = false)
-    LocalDateTime createdDate;
+    private LocalDateTime createdDate;
 
     @LastModifiedDate
-    LocalDateTime lastModifiedDate;
+    private LocalDateTime lastModifiedDate;
 
     @CreatedBy
     @Column(updatable = false)
-    String createdBy;
+    private String createdBy;
 
     @LastModifiedBy
-    String lastModifiedBy;
+    private String lastModifiedBy;
 
 }

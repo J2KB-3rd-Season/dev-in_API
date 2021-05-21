@@ -14,12 +14,12 @@ public class UserSNS {
     @Id
     @GeneratedValue
     @Column(name = "user_sns_id")
-    Long id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    User user;
+    private User user;
 
-    String url;
+    private String url;
 
 }

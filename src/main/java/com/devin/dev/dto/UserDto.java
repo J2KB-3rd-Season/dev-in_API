@@ -1,6 +1,7 @@
 package com.devin.dev.dto;
 
 import com.devin.dev.entity.user.UserStatus;
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,4 +19,6 @@ public class UserDto {
     private UserStatus status;
 
     private String sns_type;
+
+
 }

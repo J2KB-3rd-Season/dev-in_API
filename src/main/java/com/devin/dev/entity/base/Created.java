@@ -15,9 +15,9 @@ public class Created {
 
     @CreatedDate
     @Column(updatable = false)
-    LocalDateTime createdDate;
+    private LocalDateTime createdDate;
 
     @CreatedBy
     @Column(updatable = false)
-    String createdBy;
+    private String createdBy;
 }
