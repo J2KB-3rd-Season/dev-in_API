@@ -3,7 +3,6 @@ package com.devin.dev.repository.reply;
 import com.devin.dev.dto.QReplyLikeDto;
 import com.devin.dev.dto.ReplyLikeDto;
 import com.devin.dev.entity.post.Post;
-import com.devin.dev.entity.reply.QReplyLike;
 import com.devin.dev.entity.reply.Reply;
 import com.devin.dev.entity.reply.ReplyLike;
 import com.devin.dev.entity.user.User;
@@ -22,7 +21,6 @@ import static com.devin.dev.entity.reply.QReplyLike.replyLike;
 public class ReplyRepositoryQueryImpl implements ReplyRepositoryQuery {
 
     private final JPAQueryFactory queryFactory;
-
     private final EntityManager em;
 
     @Override
@@ -89,15 +87,24 @@ public class ReplyRepositoryQueryImpl implements ReplyRepositoryQuery {
     }
 
     @Override
-    public boolean deleteByReplyLikeId(Long replyLikeId) {
-        ReplyLike replyLike = queryFactory
-                .selectFrom(QReplyLike.replyLike)
-                .where(QReplyLike.replyLike.id.eq(replyLikeId))
-                .fetchOne();
-
+    public void deleteLike(ReplyLike replyLike) {
         em.remove(replyLike);
+    }
 
-        return true;
+    @Override
+    public ReplyLike findLikeByUser(Reply inputReply, User inputUser) {
+        return queryFactory
+                .selectFrom(replyLike)
+                .where(
+                        replyLike.reply.eq(inputReply),
+                        replyLike.user.eq(inputUser)
+                )
+                .fetchOne();
+    }
+
+    @Override
+    public void saveLike(ReplyLike replyLike) {
+        em.persist(replyLike);
     }
 
 

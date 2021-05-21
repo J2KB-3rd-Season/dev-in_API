@@ -22,5 +22,9 @@ public interface ReplyRepositoryQuery {
 
     Optional<ReplyLike> findReplyLikeByLikeId(Long replyLikeId);
 
-    boolean deleteByReplyLikeId(Long replyLikeId);
+    void deleteLike(ReplyLike replyLike);
+
+    ReplyLike findLikeByUser(Reply inputReply, User inputUser);
+
+    void saveLike(ReplyLike replyLike);
 }

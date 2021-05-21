@@ -10,12 +10,8 @@ import com.devin.dev.entity.user.UserStatus;
 import com.devin.dev.repository.post.PostRepository;
 import com.devin.dev.repository.reply.ReplyRepository;
 import com.devin.dev.repository.user.UserRepository;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +25,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -46,47 +41,6 @@ class ReplyRepositoryTest {
 
     @Autowired
     ReplyRepository replyRepository;
-
-    @BeforeEach
-    void setDummyData() {
-//        User userA = new User("A", "a@b.com", "passA", "0001", UserStatus.ACTIVE);
-//        Post postA1 = new Post(userA, "PostA1", "ContentA1");
-//        Post postA2 = new Post(userA, "PostA2", "ContentA2");
-//        userA.getPosts().add(postA1);
-//        userA.getPosts().add(postA2);
-//        em.persist(postA1);
-//        em.persist(postA2);
-//        em.persist(userA);
-//
-//
-//        User userB = new User("B", "b@b.com", "passB", "0002", UserStatus.DELETED);
-//        Post postB1 = new Post(userB, "PostB1", "ContentB1");
-//        Post postB2 = new Post(userB, "PostB2", "ContentB2");
-//        Post postB3 = new Post(userB, "PostB3", "ContentB3");
-//        Post postB4 = new Post(userB, "PostB4", "ContentB4");
-//        userB.getPosts().add(postB1);
-//        userB.getPosts().add(postB2);
-//        userB.getPosts().add(postB3);
-//        userB.getPosts().add(postB4);
-//        em.persist(postB1);
-//        em.persist(postB2);
-//        em.persist(postB3);
-//        em.persist(postB4);
-//        em.persist(userB);
-//
-//
-//        User userC = new User("C", "c@b.com", "passC", "0003", UserStatus.DORMANT);
-//        Post postC1 = new Post(userC, "PostC1", "ContentC1");
-//        Post postC2 = new Post(userC, "PostC2", "ContentC2");
-//        Post postC3 = new Post(userC, "PostC3", "ContentC3");
-//        userC.getPosts().add(postC1);
-//        userC.getPosts().add(postC2);
-//        userC.getPosts().add(postC3);
-//        em.persist(postC1);
-//        em.persist(postC2);
-//        em.persist(userC);
-
-    }
 
     @Test
     void postReply() {
@@ -283,7 +237,7 @@ class ReplyRepositoryTest {
         ReplyLike replyLike = replyRepository.findReplyLikeByLikeId(like1.get().getLikeId()).get();
 
         // 하나 지우면
-        replyRepository.deleteByReplyLikeId(replyLike.getId());
+        replyRepository.deleteLike(replyLike);
 
         like1 = replyRepository.findReplyLikeByReplyAndUser(reply.getId(), replyLikeUser1);
         assertThat(like1).isEmpty();
