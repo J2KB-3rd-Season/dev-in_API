@@ -3,7 +3,7 @@ package com.devin.dev.service;
 import com.devin.dev.entity.post.Post;
 import com.devin.dev.entity.reply.Reply;
 import com.devin.dev.entity.reply.ReplyImage;
-import com.devin.dev.entity.reply.ReplyLike;
+import com.devin.dev.entity.reply.ReplyRecommend;
 import com.devin.dev.entity.user.User;
 import com.devin.dev.repository.post.PostRepository;
 import com.devin.dev.repository.reply.ReplyRepository;
@@ -65,25 +65,25 @@ public class ReplyService {
         Reply reply = replyRepository.findById(replyId).orElseThrow(() -> new IllegalArgumentException("답변 조회 실패"));
 
         // 추천 조회
-        ReplyLike replyLike = replyRepository.findLikeByUser(reply, user);
+        ReplyRecommend replyRecommend = replyRepository.findLikeByUser(reply, user);
 
         Long likeId;
         // 추천 유무에 따라 실행
-        if(replyLike != null) {
-            likeId = replyLike.getId();
-            replyRepository.deleteLike(replyLike);
+        if(replyRecommend != null) {
+            likeId = replyRecommend.getId();
+            replyRepository.deleteLike(replyRecommend);
             // 좋아요 누른 사람 경험치 감소
             user.changeExp(User.ExpChangeType.REPLY_CANCEL_LIKE);
             // 답변 작성자 경험치 감소
             reply.getUser().changeExp(User.ExpChangeType.REPLY_NOT_BE_LIKED);
         } else {
-            replyLike = reply.like(user, new ReplyLike());
-            likeId = replyLike.getId();
+            replyRecommend = reply.like(user, new ReplyRecommend());
+            likeId = replyRecommend.getId();
             // 좋아요 누른 사람 경험치 증가
             user.changeExp(User.ExpChangeType.REPLY_LIKE);
             // 답변 작성자 경험치 증가
             reply.getUser().changeExp(User.ExpChangeType.REPLY_BE_LIKED);
-            replyRepository.saveLike(replyLike);
+            replyRepository.saveLike(replyRecommend);
         }
 
         return likeId;

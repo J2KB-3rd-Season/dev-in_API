@@ -3,7 +3,7 @@ package com.devin.dev.repository.reply;
 import com.devin.dev.dto.ReplyLikeDto;
 import com.devin.dev.entity.post.Post;
 import com.devin.dev.entity.reply.Reply;
-import com.devin.dev.entity.reply.ReplyLike;
+import com.devin.dev.entity.reply.ReplyRecommend;
 import com.devin.dev.entity.user.User;
 import org.springframework.data.domain.Pageable;
 
@@ -20,11 +20,11 @@ public interface ReplyRepositoryQuery {
 
     Long findReplyLikeCountById(Long replyId);
 
-    Optional<ReplyLike> findReplyLikeByLikeId(Long replyLikeId);
+    Optional<ReplyRecommend> findReplyLikeByLikeId(Long replyLikeId);
 
-    void deleteLike(ReplyLike replyLike);
+    void deleteLike(ReplyRecommend replyRecommend);
 
-    ReplyLike findLikeByUser(Reply inputReply, User inputUser);
+    ReplyRecommend findLikeByUser(Reply inputReply, User inputUser);
 
-    void saveLike(ReplyLike replyLike);
+    void saveLike(ReplyRecommend replyRecommend);
 }

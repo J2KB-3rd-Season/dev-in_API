@@ -12,7 +12,7 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor
 @Getter
-public class ReplyLike extends Created {
+public class ReplyRecommend extends Created {
 
     @Id
     @GeneratedValue

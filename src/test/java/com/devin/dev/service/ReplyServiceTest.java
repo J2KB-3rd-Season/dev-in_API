@@ -2,7 +2,7 @@ package com.devin.dev.service;
 
 import com.devin.dev.entity.post.Post;
 import com.devin.dev.entity.reply.Reply;
-import com.devin.dev.entity.reply.ReplyLike;
+import com.devin.dev.entity.reply.ReplyRecommend;
 import com.devin.dev.entity.user.User;
 import com.devin.dev.entity.user.UserStatus;
 import com.devin.dev.repository.reply.ReplyRepository;
@@ -73,11 +73,11 @@ class ReplyServiceTest {
 
         Long replyLikeId = replyService.changeReplyLike(likeUser.getId(), reply.getId());
 
-        ReplyLike replyLike = em.find(ReplyLike.class, replyLikeId);
+        ReplyRecommend replyRecommend = em.find(ReplyRecommend.class, replyLikeId);
 
         // 좋아요 누른 사람 경험치 1 증가 검증
-        assertThat(replyLike.getUser()).isEqualTo(likeUser);
-        assertThat(replyLike.getUser().getExp()).isEqualTo(1);
+        assertThat(replyRecommend.getUser()).isEqualTo(likeUser);
+        assertThat(replyRecommend.getUser().getExp()).isEqualTo(1);
 
         replyUser = em.find(User.class, replyUser.getId());
 
@@ -106,14 +106,14 @@ class ReplyServiceTest {
         Reply reply = Reply.createReply(post1, replyUser, "reply_content");
         em.persist(reply);
 
-        ReplyLike replyLike = new ReplyLike();
-        replyLike.setReply(reply);
-        replyLike.setUser(likeUser);
-        em.persist(replyLike);
+        ReplyRecommend replyRecommend = new ReplyRecommend();
+        replyRecommend.setReply(reply);
+        replyRecommend.setUser(likeUser);
+        em.persist(replyRecommend);
 
         // 좋아요 취소 검증
         Long replyLikeId = replyService.changeReplyLike(likeUser.getId(), reply.getId());
-        assertThat(replyLike.getId()).isEqualTo(replyLikeId);
+        assertThat(replyRecommend.getId()).isEqualTo(replyLikeId);
 
         likeUser = em.find(User.class, likeUser.getId());
 

@@ -33,7 +33,7 @@ public class Post extends ModifiedCreated {
     private final List<PostTag> tags = new ArrayList<>();
 
     @OneToMany(mappedBy = "post")
-    private final List<PostLike> likes = new ArrayList<>();
+    private final List<PostRecommend> postRecommends = new ArrayList<>();
 
     @OneToMany(mappedBy = "post")
     private final List<PostImage> images = new ArrayList<>();

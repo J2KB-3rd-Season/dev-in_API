@@ -10,7 +10,7 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class PostLike extends Created {
+public class PostRecommend extends Created {
 
     @Id
     @GeneratedValue

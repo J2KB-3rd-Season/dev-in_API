@@ -3,8 +3,9 @@ package com.devin.dev.repository.reply;
 import com.devin.dev.dto.QReplyLikeDto;
 import com.devin.dev.dto.ReplyLikeDto;
 import com.devin.dev.entity.post.Post;
+import com.devin.dev.entity.reply.QReplyRecommend;
 import com.devin.dev.entity.reply.Reply;
-import com.devin.dev.entity.reply.ReplyLike;
+import com.devin.dev.entity.reply.ReplyRecommend;
 import com.devin.dev.entity.user.User;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.devin.dev.entity.reply.QReply.reply;
-import static com.devin.dev.entity.reply.QReplyLike.replyLike;
+import static com.devin.dev.entity.reply.QReplyRecommend.replyRecommend;
+//import static com.devin.dev.entity.reply.QReplyLike.replyLike;
 
 @RequiredArgsConstructor
 public class ReplyRepositoryQueryImpl implements ReplyRepositoryQuery {
@@ -40,14 +42,14 @@ public class ReplyRepositoryQueryImpl implements ReplyRepositoryQuery {
         return Optional.ofNullable(queryFactory
                 .select(new QReplyLikeDto(
                         reply.id,
-                        replyLike.id,
-                        replyLike.user.id,
-                        replyLike.user.name.as("username")
+                        replyRecommend.id,
+                        replyRecommend.user.id,
+                        replyRecommend.user.name.as("username")
                 ))
                 .from(reply)
-                .leftJoin(reply.likes, replyLike)
+                .leftJoin(reply.replyRecommends, replyRecommend)
                 .where(
-                        replyLike.user.eq(user),
+                        replyRecommend.user.eq(user),
                         reply.id.eq(replyId)
                 )
                 .fetchOne());
@@ -58,12 +60,12 @@ public class ReplyRepositoryQueryImpl implements ReplyRepositoryQuery {
         return queryFactory
                 .select(new QReplyLikeDto(
                         reply.id,
-                        replyLike.id,
-                        replyLike.user.id,
-                        replyLike.user.name.as("username")
+                        replyRecommend.id,
+                        replyRecommend.user.id,
+                        replyRecommend.user.name.as("username")
                 ))
                 .from(reply)
-                .leftJoin(reply.likes, replyLike)
+                .leftJoin(reply.replyRecommends, replyRecommend)
                 .where(reply.id.eq(replyId))
                 .fetch();
     }
@@ -71,40 +73,40 @@ public class ReplyRepositoryQueryImpl implements ReplyRepositoryQuery {
     @Override
     public Long findReplyLikeCountById(Long replyId) {
         return queryFactory
-                .select(replyLike.id)
+                .select(replyRecommend.id)
                 .from(reply)
                 .where(reply.id.eq(replyId))
                 .fetchCount();
     }
 
     @Override
-    public Optional<ReplyLike> findReplyLikeByLikeId(Long replyLikeId) {
+    public Optional<ReplyRecommend> findReplyLikeByLikeId(Long replyLikeId) {
         return Optional.ofNullable(queryFactory
-                .select(replyLike)
-                .from(replyLike)
-                .where(replyLike.id.eq(replyLikeId))
+                .select(replyRecommend)
+                .from(replyRecommend)
+                .where(replyRecommend.id.eq(replyLikeId))
                 .fetchOne());
     }
 
     @Override
-    public void deleteLike(ReplyLike replyLike) {
-        em.remove(replyLike);
+    public void deleteLike(ReplyRecommend replyRecommend) {
+        em.remove(replyRecommend);
     }
 
     @Override
-    public ReplyLike findLikeByUser(Reply inputReply, User inputUser) {
+    public ReplyRecommend findLikeByUser(Reply inputReply, User inputUser) {
         return queryFactory
-                .selectFrom(replyLike)
+                .selectFrom(replyRecommend)
                 .where(
-                        replyLike.reply.eq(inputReply),
-                        replyLike.user.eq(inputUser)
+                        replyRecommend.reply.eq(inputReply),
+                        replyRecommend.user.eq(inputUser)
                 )
                 .fetchOne();
     }
 
     @Override
-    public void saveLike(ReplyLike replyLike) {
-        em.persist(replyLike);
+    public void saveLike(ReplyRecommend replyRecommend) {
+        em.persist(replyRecommend);
     }
 
 
