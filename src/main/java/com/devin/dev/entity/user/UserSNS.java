@@ -13,7 +13,7 @@ public class UserSNS {
 
     @Id
     @GeneratedValue
-    @Column(name = "user_sns_id")
+    @Column(name = "sns_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

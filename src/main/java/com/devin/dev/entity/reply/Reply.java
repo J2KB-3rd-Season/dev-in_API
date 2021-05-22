@@ -33,7 +33,7 @@ public class Reply extends ModifiedCreated {
     private User user;
 
     @OneToMany(mappedBy = "reply")
-    private final List<ReplyRecommend> replyRecommends = new ArrayList<>();
+    private final List<ReplyLike> likes = new ArrayList<>();
 
     @OneToMany(mappedBy = "reply")
     private final List<ReplyImage> images = new ArrayList<>();
@@ -79,15 +79,15 @@ public class Reply extends ModifiedCreated {
         }
     }
 
-    public ReplyRecommend like(User user, ReplyRecommend replyRecommend) {
-        replyRecommend.setReply(this);
-        replyRecommend.setUser(user);
-        this.replyRecommends.add(replyRecommend);
-        return replyRecommend;
+    public ReplyLike like(User user, ReplyLike replyLike) {
+        replyLike.setReply(this);
+        replyLike.setUser(user);
+        this.likes.add(replyLike);
+        return replyLike;
     }
 
-    public void cancelLike(ReplyRecommend replyRecommend) {
-        this.replyRecommends.remove(replyRecommend);
+    public void cancelLike(ReplyLike replyLike) {
+        this.likes.remove(replyLike);
     }
 
     public void setImages(List<ReplyImage> images) {

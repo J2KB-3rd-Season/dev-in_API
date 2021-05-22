@@ -10,11 +10,11 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class PostRecommend extends Created {
+public class PostLike extends Created {
 
     @Id
     @GeneratedValue
-    @Column(name = "post_like_id")
+    @Column(name = "like_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
