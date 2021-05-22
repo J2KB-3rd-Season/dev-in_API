@@ -4,11 +4,12 @@ import com.devin.dev.dto.ReplyLikeDto;
 import com.devin.dev.entity.post.Post;
 import com.devin.dev.entity.reply.Reply;
 import com.devin.dev.entity.reply.ReplyImage;
-import com.devin.dev.entity.reply.ReplyRecommend;
+import com.devin.dev.entity.reply.ReplyLike;
 import com.devin.dev.entity.user.User;
 import com.devin.dev.entity.user.UserStatus;
 import com.devin.dev.repository.post.PostRepository;
 import com.devin.dev.repository.reply.ReplyRepository;
+import com.devin.dev.repository.replyLike.ReplyLikeRepository;
 import com.devin.dev.repository.user.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,9 @@ class ReplyRepositoryTest {
     @Autowired
     ReplyRepository replyRepository;
 
+    @Autowired
+    ReplyLikeRepository replyLikeRepository;
+
     @Test
     void postReply() {
         User userD = new User("D", "d@b.com", "passD", "0004", UserStatus.ACTIVE);
@@ -62,6 +66,7 @@ class ReplyRepositoryTest {
     }
 
     @Test
+    @Rollback(false)
     void viewFirstPageReply() {
         User userD = new User("D", "d@b.com", "passD", "0004", UserStatus.ACTIVE);
         Post postD1 = new Post(userD, "PostC1", "ContentC1");
@@ -148,19 +153,19 @@ class ReplyRepositoryTest {
 
         Reply reply = Reply.createReply(post1, replyUser, "reply_content");
 
-        ReplyRecommend replyRecommend1 = new ReplyRecommend();
-        ReplyRecommend replyRecommend2 = new ReplyRecommend();
-        ReplyRecommend replyRecommend3 = new ReplyRecommend();
-        ReplyRecommend replyRecommend4 = new ReplyRecommend();
+        ReplyLike replyLike1 = new ReplyLike();
+        ReplyLike replyLike2 = new ReplyLike();
+        ReplyLike replyLike3 = new ReplyLike();
+        ReplyLike replyLike4 = new ReplyLike();
 
-        reply.like(replyLikeUser1, replyRecommend1);
-        reply.like(replyLikeUser2, replyRecommend2);
-        reply.like(replyLikeUser3, replyRecommend3);
-        reply.like(replyLikeUser4, replyRecommend4);
-        em.persist(replyRecommend1);
-        em.persist(replyRecommend2);
-        em.persist(replyRecommend3);
-        em.persist(replyRecommend4);
+        reply.like(replyLikeUser1, replyLike1);
+        reply.like(replyLikeUser2, replyLike2);
+        reply.like(replyLikeUser3, replyLike3);
+        reply.like(replyLikeUser4, replyLike4);
+        em.persist(replyLike1);
+        em.persist(replyLike2);
+        em.persist(replyLike3);
+        em.persist(replyLike4);
         em.persist(reply);
 
         Optional<ReplyLikeDto> like1 = replyRepository.findReplyLikeByReplyAndUser(reply.getId(), replyLikeUser1);
@@ -201,19 +206,19 @@ class ReplyRepositoryTest {
 
         Reply reply = Reply.createReply(post1, replyUser, "reply_content");
 
-        ReplyRecommend replyRecommend1 = new ReplyRecommend();
-        ReplyRecommend replyRecommend2 = new ReplyRecommend();
-        ReplyRecommend replyRecommend3 = new ReplyRecommend();
-        ReplyRecommend replyRecommend4 = new ReplyRecommend();
+        ReplyLike replyLike1 = new ReplyLike();
+        ReplyLike replyLike2 = new ReplyLike();
+        ReplyLike replyLike3 = new ReplyLike();
+        ReplyLike replyLike4 = new ReplyLike();
 
-        reply.like(replyLikeUser1, replyRecommend1);
-        reply.like(replyLikeUser2, replyRecommend2);
-        reply.like(replyLikeUser3, replyRecommend3);
-        reply.like(replyLikeUser4, replyRecommend4);
-        em.persist(replyRecommend1);
-        em.persist(replyRecommend2);
-        em.persist(replyRecommend3);
-        em.persist(replyRecommend4);
+        reply.like(replyLikeUser1, replyLike1);
+        reply.like(replyLikeUser2, replyLike2);
+        reply.like(replyLikeUser3, replyLike3);
+        reply.like(replyLikeUser4, replyLike4);
+        em.persist(replyLike1);
+        em.persist(replyLike2);
+        em.persist(replyLike3);
+        em.persist(replyLike4);
         em.persist(reply);
 
         Optional<ReplyLikeDto> like1 = replyRepository.findReplyLikeByReplyAndUser(reply.getId(), replyLikeUser1);
@@ -234,10 +239,10 @@ class ReplyRepositoryTest {
                         replyLikeUser4.getName()
                 );
 
-        ReplyRecommend replyRecommend = replyRepository.findReplyLikeByLikeId(like1.get().getLikeId()).get();
+        ReplyLike replyLike = replyRepository.findReplyLikeByLikeId(like1.get().getLikeId()).get();
 
         // 하나 지우면
-        replyRepository.deleteLike(replyRecommend);
+        replyLikeRepository.delete(replyLike);
 
         like1 = replyRepository.findReplyLikeByReplyAndUser(reply.getId(), replyLikeUser1);
         assertThat(like1).isEmpty();

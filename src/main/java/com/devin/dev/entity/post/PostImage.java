@@ -26,5 +26,4 @@ public class PostImage {
     private String storedFilePath;
 
     private long file_size;
-    private int order;
 }

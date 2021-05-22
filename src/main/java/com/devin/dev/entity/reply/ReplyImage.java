@@ -21,19 +21,17 @@ public class ReplyImage {
     private Reply reply;
 
     private String path;
-    private int order;
 
-    public ReplyImage(String path, int order) {
+    public ReplyImage(String path) {
         this.path = path;
-        this.order = order;
     }
 
     public static List<ReplyImage> createReplyImages(List<String> imagePaths) {
 
         List<ReplyImage> replyImages = new ArrayList<>();
 
-        for (int i = 0; i < imagePaths.size(); i++) {
-            ReplyImage replyImage = new ReplyImage(imagePaths.get(i), i);
+        for (String imagePath : imagePaths) {
+            ReplyImage replyImage = new ReplyImage(imagePath);
             replyImages.add(replyImage);
         }
 

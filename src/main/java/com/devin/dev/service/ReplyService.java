@@ -3,11 +3,12 @@ package com.devin.dev.service;
 import com.devin.dev.entity.post.Post;
 import com.devin.dev.entity.reply.Reply;
 import com.devin.dev.entity.reply.ReplyImage;
-import com.devin.dev.entity.reply.ReplyRecommend;
+import com.devin.dev.entity.reply.ReplyLike;
 import com.devin.dev.entity.user.User;
 import com.devin.dev.repository.post.PostRepository;
 import com.devin.dev.repository.reply.ReplyRepository;
 import com.devin.dev.repository.replyImage.ReplyImageRepository;
+import com.devin.dev.repository.replyLike.ReplyLikeRepository;
 import com.devin.dev.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ public class ReplyService {
     private final PostRepository postRepository;
     private final ReplyRepository replyRepository;
     private final ReplyImageRepository replyImageRepository;
+    private final ReplyLikeRepository replyLikeRepository;
 
     // 답변 작성
     @Transactional
@@ -36,11 +38,14 @@ public class ReplyService {
         List<ReplyImage> replyImages = ReplyImage.createReplyImages(imagePaths);
         Reply reply = Reply.createReplyWithImages(post, user, replyImages, content);
 
-        // 리플 작성자 경험치증가
-        user.changeExp(User.ExpChangeType.CREATE_REPLY);
+        // 리플 작성자 경험치증가 (게시글작성자 != 리플작성자 인 경우)
+        if(!post.getUser().getId().equals(user.getId())) {
+            user.changeExp(User.ExpChangeType.CREATE_REPLY);
+        }
 
         // 저장
         replyRepository.save(reply);
+        replyImageRepository.saveAll(replyImages);
 
         // reply_id 리턴
         return reply.getId();
@@ -53,8 +58,20 @@ public class ReplyService {
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유저 조회 실패"));
         Reply reply = replyRepository.findById(replyId).orElseThrow(() -> new IllegalArgumentException("답변 조회 실패"));
 
-        return 0L;
-//        Reply.setReplyImages();
+        // 기존 이미지 경로 삭제
+        List<ReplyImage> replyImages = replyImageRepository.findByReply(reply);
+        replyImageRepository.deleteInBatch(replyImages);
+
+        // 수정된 내용 반영
+        List<ReplyImage> newReplyImages = ReplyImage.createReplyImages(imagePaths);
+        reply.setContent(content);
+        reply.setImages(newReplyImages);
+
+        // 저장
+        replyImageRepository.saveAll(newReplyImages);
+        replyRepository.save(reply);
+
+        return reply.getId();
     }
 
     // 좋아요 상태변경
@@ -65,28 +82,25 @@ public class ReplyService {
         Reply reply = replyRepository.findById(replyId).orElseThrow(() -> new IllegalArgumentException("답변 조회 실패"));
 
         // 추천 조회
-        ReplyRecommend replyRecommend = replyRepository.findLikeByUser(reply, user);
+        ReplyLike replyLike = replyRepository.findLikeByUser(reply, user);
 
-        Long likeId;
         // 추천 유무에 따라 실행
-        if(replyRecommend != null) {
-            likeId = replyRecommend.getId();
-            replyRepository.deleteLike(replyRecommend);
+        if(replyLike != null) {
+            replyLikeRepository.delete(replyLike);
             // 좋아요 누른 사람 경험치 감소
             user.changeExp(User.ExpChangeType.REPLY_CANCEL_LIKE);
             // 답변 작성자 경험치 감소
             reply.getUser().changeExp(User.ExpChangeType.REPLY_NOT_BE_LIKED);
         } else {
-            replyRecommend = reply.like(user, new ReplyRecommend());
-            likeId = replyRecommend.getId();
+            replyLike = reply.like(user, new ReplyLike());
             // 좋아요 누른 사람 경험치 증가
             user.changeExp(User.ExpChangeType.REPLY_LIKE);
             // 답변 작성자 경험치 증가
             reply.getUser().changeExp(User.ExpChangeType.REPLY_BE_LIKED);
-            replyRepository.saveLike(replyRecommend);
+            replyLikeRepository.save(replyLike);
         }
 
-        return likeId;
+        return replyLike.getId();
     }
 
 }
