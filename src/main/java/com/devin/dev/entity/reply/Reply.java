@@ -55,7 +55,7 @@ public class Reply extends ModifiedCreated {
         return reply;
     }
 
-    private static void setReplyImage(Reply reply, ReplyImage replyImage) {
+    public static void setReplyImage(Reply reply, ReplyImage replyImage) {
         reply.images.add(replyImage);
         replyImage.setReply(reply);
     }
@@ -73,6 +73,7 @@ public class Reply extends ModifiedCreated {
     }
 
     public static void setReplyImages(List<ReplyImage> images, Reply reply) {
+        reply.images.clear();
         for (ReplyImage image : images) {
             setReplyImage(reply, image);
         }
@@ -87,5 +88,12 @@ public class Reply extends ModifiedCreated {
 
     public void cancelLike(ReplyLike replyLike) {
         this.likes.remove(replyLike);
+    }
+
+    public void setImages(List<ReplyImage> images) {
+        this.images.clear();
+        for (ReplyImage image : images) {
+            setReplyImage(this, image);
+        }
     }
 }

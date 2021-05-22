@@ -9,6 +9,7 @@ import com.devin.dev.entity.user.User;
 import com.devin.dev.entity.user.UserStatus;
 import com.devin.dev.repository.post.PostRepository;
 import com.devin.dev.repository.reply.ReplyRepository;
+import com.devin.dev.repository.replyLike.ReplyLikeRepository;
 import com.devin.dev.repository.user.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,9 @@ class ReplyRepositoryTest {
 
     @Autowired
     ReplyRepository replyRepository;
+
+    @Autowired
+    ReplyLikeRepository replyLikeRepository;
 
     @Test
     void postReply() {
@@ -237,7 +241,7 @@ class ReplyRepositoryTest {
         ReplyLike replyLike = replyRepository.findReplyLikeByLikeId(like1.get().getLikeId()).get();
 
         // 하나 지우면
-        replyRepository.deleteLike(replyLike);
+        replyLikeRepository.delete(replyLike);
 
         like1 = replyRepository.findReplyLikeByReplyAndUser(reply.getId(), replyLikeUser1);
         assertThat(like1).isEmpty();

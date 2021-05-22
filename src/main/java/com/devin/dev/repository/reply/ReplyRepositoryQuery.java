@@ -3,6 +3,7 @@ package com.devin.dev.repository.reply;
 import com.devin.dev.dto.ReplyLikeDto;
 import com.devin.dev.entity.post.Post;
 import com.devin.dev.entity.reply.Reply;
+import com.devin.dev.entity.reply.ReplyImage;
 import com.devin.dev.entity.reply.ReplyLike;
 import com.devin.dev.entity.user.User;
 import org.springframework.data.domain.Pageable;
@@ -22,9 +23,6 @@ public interface ReplyRepositoryQuery {
 
     Optional<ReplyLike> findReplyLikeByLikeId(Long replyLikeId);
 
-    void deleteLike(ReplyLike replyLike);
-
     ReplyLike findLikeByUser(Reply inputReply, User inputUser);
 
-    void saveLike(ReplyLike replyLike);
 }

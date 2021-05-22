@@ -4,6 +4,7 @@ import com.devin.dev.dto.QReplyLikeDto;
 import com.devin.dev.dto.ReplyLikeDto;
 import com.devin.dev.entity.post.Post;
 import com.devin.dev.entity.reply.Reply;
+import com.devin.dev.entity.reply.ReplyImage;
 import com.devin.dev.entity.reply.ReplyLike;
 import com.devin.dev.entity.user.User;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -87,11 +88,6 @@ public class ReplyRepositoryQueryImpl implements ReplyRepositoryQuery {
     }
 
     @Override
-    public void deleteLike(ReplyLike replyLike) {
-        em.remove(replyLike);
-    }
-
-    @Override
     public ReplyLike findLikeByUser(Reply inputReply, User inputUser) {
         return queryFactory
                 .selectFrom(replyLike)
@@ -100,11 +96,6 @@ public class ReplyRepositoryQueryImpl implements ReplyRepositoryQuery {
                         replyLike.user.eq(inputUser)
                 )
                 .fetchOne();
-    }
-
-    @Override
-    public void saveLike(ReplyLike replyLike) {
-        em.persist(replyLike);
     }
 
 
