@@ -18,6 +18,7 @@ import java.util.Optional;
 import static com.devin.dev.entity.reply.QReply.reply;
 import static com.devin.dev.entity.reply.QReplyLike.replyLike;
 
+// 세부 쿼리 구현
 @RequiredArgsConstructor
 public class ReplyRepositoryQueryImpl implements ReplyRepositoryQuery {
 

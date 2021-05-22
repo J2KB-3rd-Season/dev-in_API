@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Optional;
 
+// 세부 쿼리 인터페이스
 public interface ReplyRepositoryQuery {
 
     List<Reply> findReplyPageByPost(Post post, Pageable pageable);
