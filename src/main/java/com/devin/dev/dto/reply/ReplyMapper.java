@@ -17,20 +17,24 @@ public class ReplyMapper {
     public static List<ReplyDto> toDtos(List<Reply> replies) {
         List<ReplyDto> replyDtos = new ArrayList<>();
 
-        for (Reply origin : replies) {
-            System.out.println("origin = " + origin);
-            ReplyDto target = new ReplyDto();
-            BeanUtils.copyProperties(origin, target);
-            target.setName(origin.getUser().getName());
+        for (Reply reply : replies) {
+            ReplyDto replyDto = replyToReplyDto(reply);
 
-            for (ReplyImage next : origin.getImages()) {
-                target.getImages().add(next.getPath());
-            }
-
-            replyDtos.add(target);
+            replyDtos.add(replyDto);
         }
 
         return replyDtos;
+    }
+
+    public static ReplyDto replyToReplyDto(Reply reply) {
+        ReplyDto replyDto = new ReplyDto();
+        BeanUtils.copyProperties(reply, replyDto);
+        replyDto.setName(reply.getUser().getName());
+
+        for (ReplyImage next : reply.getImages()) {
+            replyDto.getImages().add(next.getPath());
+        }
+        return replyDto;
     }
 
 }
