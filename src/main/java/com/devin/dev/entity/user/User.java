@@ -20,7 +20,7 @@ public class User extends Created {
     @Id
     @GeneratedValue
     @Column(name = "user_id")
-    Long id;
+    private Long id;
 
     @OneToMany(mappedBy = "user")
     private final List<Education> educations = new ArrayList<>();

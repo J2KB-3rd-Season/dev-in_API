@@ -2,18 +2,23 @@ package com.devin.dev.repository.reply;
 
 import com.devin.dev.dto.QReplyLikeDto;
 import com.devin.dev.dto.ReplyLikeDto;
-import com.devin.dev.entity.post.Post;
+import com.devin.dev.dto.reply.QReplyDto;
+import com.devin.dev.dto.reply.ReplyDto;
+import com.devin.dev.entity.reply.QReplyImage;
 import com.devin.dev.entity.reply.Reply;
-import com.devin.dev.entity.reply.ReplyImage;
 import com.devin.dev.entity.reply.ReplyLike;
 import com.devin.dev.entity.user.User;
+import com.querydsl.core.QueryResults;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static com.devin.dev.entity.reply.QReply.reply;
 import static com.devin.dev.entity.reply.QReplyLike.replyLike;
@@ -25,15 +30,30 @@ public class ReplyRepositoryQueryImpl implements ReplyRepositoryQuery {
     private final JPAQueryFactory queryFactory;
     private final EntityManager em;
 
+    /**
+     *
+     * select reply.username, reply.content, reply.status, replyImage.images
+     * from reply
+     * left join replyImage set reply.image_id = replyImage.id
+     * where reply.post_id = postId
+     *
+     * @return
+     */
     @Override
-    public List<Reply> findReplyPageByPost(Post post, Pageable pageable) {
-        return queryFactory
+    public Page<Reply> findReplyPageByPost(Long postId, Pageable pageable) {
+        QueryResults<Reply> results = queryFactory
                 .select(reply)
                 .from(reply)
+                .where(reply.post.id.eq(postId))
                 .orderBy(reply.lastModifiedDate.asc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .fetch();
+                .fetchResults();
+
+        List<Reply> content = results.getResults();
+        long total = results.getTotal();
+
+        return new PageImpl<>(content, pageable, total);
     }
 
     @Override

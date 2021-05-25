@@ -1,5 +1,6 @@
 package com.devin.dev.service;
 
+import com.devin.dev.dto.reply.ReplyDto;
 import com.devin.dev.entity.post.Post;
 import com.devin.dev.entity.reply.Reply;
 import com.devin.dev.entity.reply.ReplyImage;
@@ -11,13 +12,14 @@ import com.devin.dev.repository.replyImage.ReplyImageRepository;
 import com.devin.dev.repository.replyLike.ReplyLikeRepository;
 import com.devin.dev.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ReplyService {
 
@@ -39,7 +41,7 @@ public class ReplyService {
         Reply reply = Reply.createReplyWithImages(post, user, replyImages, content);
 
         // 리플 작성자 경험치증가 (게시글작성자 != 리플작성자 인 경우)
-        if(!post.getUser().getId().equals(user.getId())) {
+        if (isNotSameUser(post.getUser(), reply.getUser())) {
             user.changeExp(User.ExpChangeType.CREATE_REPLY);
         }
 
@@ -85,22 +87,36 @@ public class ReplyService {
         ReplyLike replyLike = replyRepository.findLikeByUser(reply, user);
 
         // 추천 유무에 따라 실행
-        if(replyLike != null) {
+        if (replyLike != null) {
             replyLikeRepository.delete(replyLike);
-            // 좋아요 누른 사람 경험치 감소
-            user.changeExp(User.ExpChangeType.REPLY_CANCEL_LIKE);
-            // 답변 작성자 경험치 감소
-            reply.getUser().changeExp(User.ExpChangeType.REPLY_NOT_BE_LIKED);
+            if (isNotSameUser(user, reply.getUser())) {
+                // 좋아요 누른 사람 경험치 감소
+                user.changeExp(User.ExpChangeType.REPLY_CANCEL_LIKE);
+                // 답변 작성자 경험치 감소
+                reply.getUser().changeExp(User.ExpChangeType.REPLY_NOT_BE_LIKED);
+            }
         } else {
             replyLike = reply.like(user, new ReplyLike());
-            // 좋아요 누른 사람 경험치 증가
-            user.changeExp(User.ExpChangeType.REPLY_LIKE);
-            // 답변 작성자 경험치 증가
-            reply.getUser().changeExp(User.ExpChangeType.REPLY_BE_LIKED);
+            if (isNotSameUser(user, reply.getUser())) {
+                // 좋아요 누른 사람 경험치 증가
+                user.changeExp(User.ExpChangeType.REPLY_LIKE);
+                // 답변 작성자 경험치 증가
+                reply.getUser().changeExp(User.ExpChangeType.REPLY_BE_LIKED);
+            }
             replyLikeRepository.save(replyLike);
         }
 
         return replyLike.getId();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Reply> searchReplies(Long postId, Pageable pageable) {
+        return replyRepository.findReplyPageByPost(postId, pageable);
+    }
+
+
+    private boolean isNotSameUser(User firstUser, User secondUser) {
+        return !firstUser.getId().equals(secondUser.getId());
     }
 
 }

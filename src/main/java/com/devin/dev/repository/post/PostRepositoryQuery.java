@@ -1,6 +1,6 @@
 package com.devin.dev.repository.post;
 
-import com.devin.dev.dto.PostDto;
+import com.devin.dev.dto.post.PostDto;
 import com.devin.dev.entity.post.Post;
 import com.devin.dev.entity.user.User;
 

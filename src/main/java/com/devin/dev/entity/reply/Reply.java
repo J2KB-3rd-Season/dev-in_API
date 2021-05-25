@@ -43,14 +43,14 @@ public class Reply extends ModifiedCreated {
 
     @Setter
     @Enumerated(EnumType.STRING)
-    private ReplyState state;
+    private ReplyStatus status;
 
     public static Reply createReply(Post post, User user, String content) {
         Reply reply = new Reply();
         reply.setPost(post);
         reply.setUser(user);
         reply.setContent(content);
-        reply.setState(ReplyState.VIEWABLE);
+        reply.setStatus(ReplyStatus.VIEWABLE);
 
         return reply;
     }
@@ -65,7 +65,7 @@ public class Reply extends ModifiedCreated {
         reply.setPost(post);
         reply.setUser(user);
         reply.setContent(content);
-        reply.setState(ReplyState.VIEWABLE);
+        reply.setStatus(ReplyStatus.VIEWABLE);
 
         setReplyImages(images, reply);
 

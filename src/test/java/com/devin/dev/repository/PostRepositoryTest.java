@@ -1,12 +1,11 @@
 package com.devin.dev.repository;
 
-import com.devin.dev.dto.PostDto;
+import com.devin.dev.dto.post.PostDto;
 import com.devin.dev.entity.post.Post;
 import com.devin.dev.entity.user.User;
 import com.devin.dev.entity.user.UserStatus;
 import com.devin.dev.repository.post.PostRepository;
 import com.devin.dev.repository.user.UserRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,6 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional

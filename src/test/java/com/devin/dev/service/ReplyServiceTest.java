@@ -33,7 +33,6 @@ class ReplyServiceTest {
     ReplyRepository replyRepository;
 
     @Test
-    @Rollback(false) // 테스트 롤백 안하고싶으면
     void replyTest() {
         User postUser = new User("D", "d@b.com", "passD", "0004", UserStatus.ACTIVE);
         User replyUser = new User("E", "e@b.com", "passE", "0005", UserStatus.ACTIVE);

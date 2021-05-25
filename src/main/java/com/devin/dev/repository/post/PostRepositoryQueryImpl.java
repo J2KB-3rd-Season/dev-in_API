@@ -1,9 +1,8 @@
 package com.devin.dev.repository.post;
 
-import com.devin.dev.dto.PostDto;
-import com.devin.dev.dto.QPostDto;
+import com.devin.dev.dto.post.PostDto;
+import com.devin.dev.dto.post.QPostDto;
 import com.devin.dev.entity.post.Post;
-import com.devin.dev.entity.post.QPost;
 import com.devin.dev.entity.user.User;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -38,7 +37,6 @@ public class PostRepositoryQueryImpl implements PostRepositoryQuery {
                 .fetch();
     }
 
-
     public List<PostDto> findPostDtoByUserWithProjection(User user) {
         return queryFactory
                 .select(Projections.constructor( // Projections.constructor 스태틱 메서드 사용
@@ -53,7 +51,7 @@ public class PostRepositoryQueryImpl implements PostRepositoryQuery {
     @Override
     public List<PostDto> findPostDtoByUser(User user) {
         return queryFactory
-                .select(new QPostDto(post.title, post.content)) // QDTO 생성자 사용. @Projections 및 Q파일 컨파일
+                .select(new QPostDto(post.title, post.content, post.state)) // QDTO 생성자 사용. @Projections 및 Q파일 컨파일
                 .from(post)
                 .where(post.user.eq(user))
                 .fetch();

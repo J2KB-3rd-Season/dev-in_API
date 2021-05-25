@@ -1,6 +1,8 @@
 package com.devin.dev.repository;
 
 import com.devin.dev.dto.ReplyLikeDto;
+import com.devin.dev.dto.reply.ReplyDto;
+import com.devin.dev.dto.reply.ReplyMapper;
 import com.devin.dev.entity.post.Post;
 import com.devin.dev.entity.reply.Reply;
 import com.devin.dev.entity.reply.ReplyImage;
@@ -12,8 +14,10 @@ import com.devin.dev.repository.reply.ReplyRepository;
 import com.devin.dev.repository.replyLike.ReplyLikeRepository;
 import com.devin.dev.repository.user.UserRepository;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.annotation.Rollback;
@@ -22,6 +26,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -80,11 +86,64 @@ class ReplyRepositoryTest {
         }
 
         Pageable pageable = PageRequest.of(0, 4);
-        List<Reply> firstPageReplies = replyRepository.findReplyPageByPost(postD1, pageable);
+        Page<Reply> firstPageReplies = replyRepository.findReplyPageByPost(postD1.getId(), pageable);
 
-        assertThat(firstPageReplies).allMatch(r -> r.getUser().getId().equals(userD.getId()));
+        assertThat(firstPageReplies).allMatch(r -> r.getUser().getName().equals(userD.getName()));
 
         assertThat(firstPageReplies)
+                .extracting("content")
+                .containsExactly(
+                        "reply_content0",
+                        "reply_content1",
+                        "reply_content2",
+                        "reply_content3"
+                );
+
+        List<Reply> allReplies = replyRepository.findByPost(postD1);
+
+        assertThat(allReplies)
+                .extracting("content")
+                .containsExactly(
+                        "reply_content0",
+                        "reply_content1",
+                        "reply_content2",
+                        "reply_content3",
+                        "reply_content4",
+                        "reply_content5",
+                        "reply_content6",
+                        "reply_content7",
+                        "reply_content8",
+                        "reply_content9"
+                );
+
+        assertThat(allReplies).allMatch(r -> r.getUser().getId().equals(userD.getId()));
+    }
+
+    @Test
+    @Rollback(false)
+    void viewFirstPageReplyDto() {
+        User userD = new User("D", "d@b.com", "passD", "0004", UserStatus.ACTIVE);
+        Post postD1 = new Post(userD, "PostC1", "ContentC1");
+
+        em.persist(userD);
+        em.persist(postD1);
+
+        for (int i = 0; i < 10; i++) {
+            Reply reply = Reply.createReply(postD1, userD, "reply_content" + i);
+            List<ReplyImage> replyImages = ReplyImage.createReplyImages(List.of("1", "2", "3"));
+            for (ReplyImage replyImage : replyImages) {
+                em.persist(replyImage);
+            }
+            reply.setImages(replyImages);
+            em.persist(reply);
+        }
+
+        Pageable pageable = PageRequest.of(0, 4);
+        Page<Reply> firstPageReplies = replyRepository.findReplyPageByPost(postD1.getId(), pageable);
+
+        List<ReplyDto> replyDtos = ReplyMapper.toDtos(firstPageReplies.toList());
+
+        assertThat(replyDtos)
                 .extracting("content")
                 .containsExactly(
                         "reply_content0",
