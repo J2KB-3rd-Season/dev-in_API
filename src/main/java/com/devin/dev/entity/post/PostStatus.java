@@ -1,5 +1,5 @@
 package com.devin.dev.entity.post;
 
-public enum PostState {
+public enum PostStatus {
     VIEWABLE, DELETED;
 }
