@@ -3,15 +3,20 @@ package com.devin.dev.repository.post;
 import com.devin.dev.dto.post.PostDto;
 import com.devin.dev.dto.post.QPostDto;
 import com.devin.dev.entity.post.Post;
+import com.devin.dev.entity.reply.Reply;
 import com.devin.dev.entity.user.User;
-import com.querydsl.core.types.Projections;
+import com.querydsl.core.QueryResults;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 import static com.devin.dev.entity.post.QPost.post;
+import static com.devin.dev.entity.reply.QReply.reply;
 
 @RequiredArgsConstructor
 public class PostRepositoryQueryImpl implements PostRepositoryQuery {
@@ -20,29 +25,26 @@ public class PostRepositoryQueryImpl implements PostRepositoryQuery {
 
     @Override
     @Transactional
-    public List<String> findPostnameByUser(User user) {
-        return queryFactory
+    public Page<String> findPostnamePageByUser(User user, Pageable pageable) {
+        QueryResults<String> results = queryFactory
                 .select(post.title)
                 .from(post)
                 .where(post.user.eq(user))
-                .fetch();
+                .orderBy(post.lastModifiedDate.asc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetchResults();
+
+        List<String> content = results.getResults();
+        long total = results.getTotal();
+
+        return new PageImpl<>(content, pageable, total);
     }
 
     @Override
     public List<Post> findPostByUser(User user) {
         return queryFactory
                 .select(post)
-                .from(post)
-                .where(post.user.eq(user))
-                .fetch();
-    }
-
-    public List<PostDto> findPostDtoByUserWithProjection(User user) {
-        return queryFactory
-                .select(Projections.constructor( // Projections.constructor 스태틱 메서드 사용
-                        PostDto.class,
-                        post.title,
-                        post.content))
                 .from(post)
                 .where(post.user.eq(user))
                 .fetch();
@@ -56,8 +58,5 @@ public class PostRepositoryQueryImpl implements PostRepositoryQuery {
                 .where(post.user.eq(user))
                 .fetch();
     }
-
-
-
 
 }

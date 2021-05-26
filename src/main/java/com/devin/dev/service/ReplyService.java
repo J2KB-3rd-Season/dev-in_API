@@ -1,6 +1,7 @@
 package com.devin.dev.service;
 
 import com.devin.dev.dto.reply.ReplyDto;
+import com.devin.dev.dto.reply.ReplyMapper;
 import com.devin.dev.entity.post.Post;
 import com.devin.dev.entity.reply.Reply;
 import com.devin.dev.entity.reply.ReplyImage;
@@ -13,6 +14,7 @@ import com.devin.dev.repository.replyLike.ReplyLikeRepository;
 import com.devin.dev.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -110,8 +112,11 @@ public class ReplyService {
     }
 
     @Transactional(readOnly = true)
-    public Page<Reply> searchReplies(Long postId, Pageable pageable) {
-        return replyRepository.findReplyPageByPost(postId, pageable);
+    public Page<ReplyDto> searchReplyDtos(Long postId, Pageable pageable) {
+        Page<Reply> replies = replyRepository.findReplyPageByPost(postId, pageable);
+        List<ReplyDto> replyDtos = ReplyMapper.toDtos(replies.toList());
+
+        return new PageImpl<>(replyDtos, pageable, replies.getTotalElements());
     }
 
 

@@ -10,6 +10,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
@@ -75,20 +78,21 @@ class PostRepositoryTest {
     }
 
     @Test
-    void findPostnameByUser() {
+    void findPostnamePageByUser() {
 
         User userA = userRepository.findByName("A").get();
 
-        List<String> postNamesA = postRepository.findPostnameByUser(userA);
+        Pageable pageable = PageRequest.of(0, 4);
+        Page<String> postNamesA = postRepository.findPostnamePageByUser(userA, pageable);
 
-        assertThat(postNamesA.size()).isEqualTo(2);
+        assertThat(postNamesA.getTotalElements()).isEqualTo(2);
         assertThat(postNamesA).containsExactly("PostA1", "PostA2");
 
         User userD = userRepository.findByName("D").get();
 
-        List<String> postNamesD = postRepository.findPostnameByUser(userD);
+        Page<String> postNamesD = postRepository.findPostnamePageByUser(userD, pageable);
 
-        assertThat(postNamesD.size()).isEqualTo(0);
+        assertThat(postNamesD.getTotalElements()).isEqualTo(0);
     }
 
     @Test

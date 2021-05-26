@@ -27,10 +27,10 @@ public class ReplyController {
         return new CreateReplyResponse(replyId);
     }
 
-    @GetMapping("/post/{id}")
-    public Page<Reply> findReplies(
+    @GetMapping("/reply/{id}")
+    public Page<ReplyDto> findReplies(
             @PathVariable("id") Long postId, Pageable pageable) {
-        return replyService.searchReplies(postId, pageable);
+        return replyService.searchReplyDtos(postId, pageable);
     }
 
     @Data
