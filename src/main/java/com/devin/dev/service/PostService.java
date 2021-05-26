@@ -2,8 +2,8 @@ package com.devin.dev.service;
 
 import com.devin.dev.repository.post.PostRepository;
 import com.devin.dev.repository.reply.ReplyRepository;
-import com.devin.dev.repository.replyImage.ReplyImageRepository;
-import com.devin.dev.repository.replyLike.ReplyLikeRepository;
+import com.devin.dev.repository.reply.ReplyImageRepository;
+import com.devin.dev.repository.reply.ReplyLikeRepository;
 import com.devin.dev.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

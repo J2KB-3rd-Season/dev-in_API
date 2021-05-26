@@ -2,6 +2,8 @@ package com.devin.dev.repository;
 
 import com.devin.dev.dto.post.PostDto;
 import com.devin.dev.entity.post.Post;
+import com.devin.dev.entity.post.PostTag;
+import com.devin.dev.entity.post.Subject;
 import com.devin.dev.entity.user.User;
 import com.devin.dev.entity.user.UserStatus;
 import com.devin.dev.repository.post.PostRepository;
@@ -36,9 +38,27 @@ class PostRepositoryTest {
 
     @BeforeEach
     void setDummyData() {
+        Subject subject1 = new Subject("s1");
+        Subject subject2 = new Subject("s2");
+        Subject subject3 = new Subject("s3");
+        em.persist(subject1);
+        em.persist(subject2);
+        em.persist(subject3);
+
+        PostTag postTagA1_1 = new PostTag(subject1);
+        PostTag postTagA1_2 = new PostTag(subject2);
+        PostTag postTagA1_3 = new PostTag(subject3);
+        em.persist(postTagA1_1);
+        em.persist(postTagA1_2);
+        em.persist(postTagA1_3);
+        PostTag postTagA2_2 = new PostTag(subject2);
+        em.persist(postTagA2_2);
+
         User userA = new User("A", "a@b.com", "passA", "0001", UserStatus.ACTIVE);
         Post postA1 = new Post(userA, "PostA1", "ContentA1");
+        postA1.setTags(List.of(postTagA1_1, postTagA1_2, postTagA1_3));
         Post postA2 = new Post(userA, "PostA2", "ContentA2");
+        postA2.setTags(List.of(postTagA2_2));
         userA.getPosts().add(postA1);
         userA.getPosts().add(postA2);
         em.persist(postA1);
@@ -122,5 +142,10 @@ class PostRepositoryTest {
         List<PostDto> postDtosD = postRepository.findPostDtoByUser(userD);
 
         assertThat(postDtosD.size()).isEqualTo(0);
+    }
+
+    @Test
+    void findPostDtoPageWithCondition() {
+
     }
 }

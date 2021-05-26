@@ -1,9 +1,9 @@
-package com.devin.dev.repository.postImage;
+package com.devin.dev.repository.post;
 
 import com.devin.dev.entity.post.Post;
 import com.devin.dev.entity.post.PostImage;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface PostImageRepository extends JpaRepository<PostImage, Long>, PostImageRepositoryQuery {
+public interface PostImageRepository extends JpaRepository<PostImage, Long> {
 
 }

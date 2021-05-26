@@ -2,6 +2,7 @@ package com.devin.dev.entity.post;
 
 import com.devin.dev.entity.base.ModifiedCreated;
 import com.devin.dev.entity.reply.Reply;
+import com.devin.dev.entity.reply.ReplyImage;
 import com.devin.dev.entity.user.User;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -52,4 +53,17 @@ public class Post extends ModifiedCreated {
         this.title = title;
         this.content = content;
     }
+
+    public void setTags(List<PostTag> tags) {
+        this.images.clear();
+        for (PostTag tag : tags) {
+            setTag(tag);
+        }
+    }
+
+    public void setTag(PostTag tag) {
+        this.tags.add(tag);
+        tag.setPost(this);
+    }
+
 }

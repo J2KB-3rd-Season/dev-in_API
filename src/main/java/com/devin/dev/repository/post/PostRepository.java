@@ -10,13 +10,11 @@ import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long>, PostRepositoryQuery {
 
-    List<Post> findByUserAndState(User user, PostStatus state);
+    List<Post> findByUserAndStatus(User user, PostStatus status);
 
-    List<Post> findByTagsInAndState(List<PostTag> tags, PostStatus state);
+    List<Post> findByTitleLikeAndStatus(String title, PostStatus status);
 
-    List<Post> findByTitleLikeAndState(String title, PostStatus state);
-
-    List<Post> findByTitleLikeOrContentLikeAndState(String title, String content, PostStatus state);
+    List<Post> findByTitleLikeOrContentLikeAndStatus(String title, String content, PostStatus status);
 
 
 }

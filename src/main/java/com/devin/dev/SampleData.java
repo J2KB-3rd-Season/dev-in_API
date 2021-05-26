@@ -23,7 +23,6 @@ public class SampleData {
     @RequiredArgsConstructor
     static class InitData {
 
-        private final ReplyService replyService;
 
 
     }
