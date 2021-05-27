@@ -6,6 +6,8 @@ import com.devin.dev.entity.post.PostTag;
 import com.devin.dev.entity.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import javax.validation.constraints.NotNull;
+import java.util.Collection;
 import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long>, PostRepositoryQuery {
@@ -16,5 +18,5 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostRepositor
 
     List<Post> findByTitleLikeOrContentLikeAndStatus(String title, String content, PostStatus status);
 
-
+    Post findByTitle(@NotNull String title);
 }

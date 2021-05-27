@@ -3,10 +3,12 @@ package com.devin.dev.entity.post;
 import com.devin.dev.entity.base.ModifiedCreated;
 import com.devin.dev.entity.reply.Reply;
 import com.devin.dev.entity.reply.ReplyImage;
+import com.devin.dev.entity.reply.ReplyStatus;
 import com.devin.dev.entity.user.User;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -23,6 +25,7 @@ public class Post extends ModifiedCreated {
     @Column(name = "post_id")
     private Long id;
 
+    @Setter(AccessLevel.PRIVATE)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
@@ -42,9 +45,11 @@ public class Post extends ModifiedCreated {
     @NotNull
     private  String title;
 
+    @Setter
     @NotNull
     private String content;
 
+    @Setter
     @Enumerated(EnumType.STRING)
     private PostStatus status;
 
@@ -52,6 +57,29 @@ public class Post extends ModifiedCreated {
         this.user = user;
         this.title = title;
         this.content = content;
+    }
+
+    public static Post createPostWithImages(User user, List<PostImage> images, String content) {
+        Post post = new Post();
+        post.setUser(user);
+        post.setContent(content);
+        post.setStatus(PostStatus.VIEWABLE);
+
+        setPostImages(images, post);
+
+        return post;
+    }
+
+    public static void setPostImages(List<PostImage> images, Post post) {
+        post.images.clear();
+        for (PostImage image : images) {
+            setReplyImage(post, image);
+        }
+    }
+
+    private static void setReplyImage(Post post, PostImage image) {
+        post.images.add(image);
+        image.setPost(post);
     }
 
     public void setTags(List<PostTag> tags) {
@@ -66,4 +94,10 @@ public class Post extends ModifiedCreated {
         tag.setPost(this);
     }
 
+    public void setImages(List<PostImage> newPostImages) {
+        this.images.clear();
+        for (PostImage image : newPostImages) {
+            setReplyImage(this, image);
+        }
+    }
 }

@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.Query;
 import java.util.List;
 
 import static com.devin.dev.entity.post.QPost.post;
@@ -60,14 +61,15 @@ public class PostRepositoryQueryImpl implements PostRepositoryQuery {
     @Override
     public Page<PostDto> findPostDtoPageWithCondition(PostSearchCondition condition, Pageable pageable) {
         QueryResults<PostDto> results = queryFactory
-                .select(new QPostDto(
+                .selectDistinct(new QPostDto(
                         post.title,
                         user.name,
                         post.content,
                         post.status
                 ))
                 .from(post)
-                .leftJoin(post.user, user)
+                .innerJoin(post.user, user)
+                .innerJoin(post.tags, postTag)
                 .where(
                         usernameLike(condition.getUsername()),
                         titleLike(condition.getTitle()),
@@ -78,6 +80,7 @@ public class PostRepositoryQueryImpl implements PostRepositoryQuery {
                 .fetchResults();
 
         List<PostDto> content = results.getResults();
+
         long total = results.getTotal();
 
         return new PageImpl<>(content, pageable, total);
@@ -102,23 +105,23 @@ public class PostRepositoryQueryImpl implements PostRepositoryQuery {
     }
 
     private BooleanExpression usernameLike(String username) {
-        return hasText(username) ? user.name.like(username) : null;
+        return hasText(username) ? user.name.contains(username) : null;
     }
 
     private BooleanExpression titleLike(String title) {
-        return hasText(title) ? post.title.like(title) : null;
+        return hasText(title) ? post.title.contains(title) : null;
     }
 
     private BooleanExpression tagsInclude(List<String> tags) {
         if(tags == null)
             return null;
 
-        JPAQuery<PostTag> postTags = queryFactory
+        JPAQuery<PostTag> where = queryFactory
                 .select(postTag)
                 .from(postTag)
-                .leftJoin(postTag.tag, subject)
+                .innerJoin(postTag.tag, subject)
                 .where(subject.name.in(tags));
 
-        return post.tags.contains(postTags);
+        return postTag.in(where);//(where);
     }
 }

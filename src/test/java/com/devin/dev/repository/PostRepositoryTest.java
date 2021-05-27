@@ -1,5 +1,6 @@
 package com.devin.dev.repository;
 
+import com.devin.dev.controller.post.PostSearchCondition;
 import com.devin.dev.dto.post.PostDto;
 import com.devin.dev.entity.post.Post;
 import com.devin.dev.entity.post.PostTag;
@@ -7,6 +8,7 @@ import com.devin.dev.entity.post.Subject;
 import com.devin.dev.entity.user.User;
 import com.devin.dev.entity.user.UserStatus;
 import com.devin.dev.repository.post.PostRepository;
+import com.devin.dev.repository.post.PostTagRepository;
 import com.devin.dev.repository.user.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.annotation.Rollback;
 
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
@@ -32,6 +35,9 @@ class PostRepositoryTest {
 
     @Autowired
     PostRepository postRepository;
+
+    @Autowired
+    PostTagRepository postTagRepository;
 
     @Autowired
     UserRepository userRepository;
@@ -53,16 +59,22 @@ class PostRepositoryTest {
         em.persist(postTagA1_3);
         PostTag postTagA2_2 = new PostTag(subject2);
         em.persist(postTagA2_2);
+        PostTag postTagA3_3 = new PostTag(subject3);
+        em.persist(postTagA3_3);
 
         User userA = new User("A", "a@b.com", "passA", "0001", UserStatus.ACTIVE);
         Post postA1 = new Post(userA, "PostA1", "ContentA1");
         postA1.setTags(List.of(postTagA1_1, postTagA1_2, postTagA1_3));
         Post postA2 = new Post(userA, "PostA2", "ContentA2");
         postA2.setTags(List.of(postTagA2_2));
+        Post postA3 = new Post(userA, "PostA3", "ContentA3");
+        postA3.setTags(List.of(postTagA3_3));
         userA.getPosts().add(postA1);
         userA.getPosts().add(postA2);
+        userA.getPosts().add(postA3);
         em.persist(postA1);
         em.persist(postA2);
+        em.persist(postA3);
         em.persist(userA);
 
 
@@ -145,7 +157,14 @@ class PostRepositoryTest {
     }
 
     @Test
+    @Rollback(false)
     void findPostDtoPageWithCondition() {
-
+        PostSearchCondition condition = new PostSearchCondition();
+        condition.setTags(List.of("s1", "s2", "s"));
+        condition.setUsername("A");
+        condition.setTitle("Post");
+        Pageable pageable = PageRequest.of(0, 4);
+        Page<PostDto> postDtoPage = postRepository.findPostDtoPageWithCondition(condition, pageable);
+        assertThat(postDtoPage).extracting("title").containsExactly("PostA1", "PostA2");
     }
 }
