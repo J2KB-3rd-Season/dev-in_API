@@ -21,4 +21,5 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostRepositor
     List<Post> findByTitle(@NotNull String title);
 
     List<Post> findByUser(User user);
+
 }

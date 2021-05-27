@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -57,36 +58,48 @@ public class PostService {
 
     // 게시글 수정
     @Transactional
-    Long editReply(Long userId, Long postId, String content, List<String> tags, List<String> imagePaths) {
+    public Long editPost(Long userId, Long postId, String title, String content, List<String> tags, List<String> imagePaths) {
         // 엔티티 조회. 실패시 IllegalArgumentException
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유저 조회 실패"));
         Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("게시글 조회 실패"));
         List<Subject> postSubjects = subjectRepository.findByNameIn(tags);
         List<PostTag> existTags = postTagRepository.findByTagIn(postSubjects);
 
+        System.out.println("postSubjects = " + postSubjects);
+        System.out.println("existTags = " + existTags);
+        boolean b = postSubjects.containsAll(existTags.stream().map(PostTag::getTag).collect(Collectors.toList()));
+        System.out.println("booleanValue = " + b);
+
+
         // 기존 태그 및 이미지 경로 삭제
-        List<PostTag> postTags = postTagRepository.findByPost(post);
-        postTagRepository.deleteInBatch(postTags);
         List<PostImage> postImages = postImageRepository.findByPost(post);
         postImageRepository.deleteInBatch(postImages);
 
         // 수정된 내용 반영
         List<PostImage> newPostImages = PostImage.createPostImages(imagePaths);
+        post.setTitle(title);
         post.setContent(content);
-        List<PostTag> newTags = new ArrayList<>();
-        for (Subject subject : postSubjects) {
-            for (PostTag existTag : existTags) {
-                if(existTag.getTag() != subject) {
-                    newTags.add(new PostTag(subject));
-                }
+        List<PostTag> deleteList = new ArrayList<>();
+
+        for (PostTag tag : post.getTags()) { // 1 2
+            if (!postSubjects.contains(tag.getTag())) { // 2 3
+                deleteList.add(tag);
+            } else {
+                postSubjects.remove(tag.getTag());
             }
         }
-        post.setTags(newTags);
+        List<PostTag> newPostTags = PostTag.createPostTags(postSubjects);
+        postTagRepository.deleteInBatch(deleteList);
+
+        System.out.println("deleteList = " + deleteList);
+        System.out.println("newPostTags = " + newPostTags);
+        post.setTags(newPostTags);
         post.setImages(newPostImages);
 
         // 저장
         postImageRepository.saveAll(newPostImages);
         postRepository.save(post);
+        postTagRepository.saveAll(newPostTags);
 
         return post.getId();
     }
