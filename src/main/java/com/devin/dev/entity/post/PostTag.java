@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -28,5 +30,16 @@ public class PostTag {
 
     public PostTag(Subject tag) {
         this.tag = tag;
+    }
+
+    public static List<PostTag> createPostTags(List<Subject> tags) {
+        List<PostTag> postTags = new ArrayList<>();
+
+        for (Subject tag : tags) {
+            PostTag postTag = new PostTag(tag);
+            postTags.add(postTag);
+        }
+
+        return postTags;
     }
 }

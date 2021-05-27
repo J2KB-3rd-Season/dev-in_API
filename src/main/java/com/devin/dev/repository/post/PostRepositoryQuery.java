@@ -15,8 +15,6 @@ public interface PostRepositoryQuery {
 
     Page<PostDto> findPostDtoPageWithCondition(PostSearchCondition condition, Pageable pageable);
 
-    List<Post> findPostByUser(User user);
-
     List<PostDto> findPostDtoByUser(User user);
     
 }

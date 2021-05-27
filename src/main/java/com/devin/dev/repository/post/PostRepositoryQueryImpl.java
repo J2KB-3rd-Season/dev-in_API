@@ -87,15 +87,6 @@ public class PostRepositoryQueryImpl implements PostRepositoryQuery {
     }
 
     @Override
-    public List<Post> findPostByUser(User user) {
-        return queryFactory
-                .select(post)
-                .from(post)
-                .where(post.user.eq(user))
-                .fetch();
-    }
-
-    @Override
     public List<PostDto> findPostDtoByUser(User user) {
         return queryFactory
                 .select(new QPostDto(post.title, post.user.name, post.content, post.status)) // QDTO 생성자 사용. @Projections 및 Q파일 컨파일

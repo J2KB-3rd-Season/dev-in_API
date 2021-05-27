@@ -18,5 +18,7 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostRepositor
 
     List<Post> findByTitleLikeOrContentLikeAndStatus(String title, String content, PostStatus status);
 
-    Post findByTitle(@NotNull String title);
+    List<Post> findByTitle(@NotNull String title);
+
+    List<Post> findByUser(User user);
 }

@@ -2,8 +2,6 @@ package com.devin.dev.entity.post;
 
 import com.devin.dev.entity.base.ModifiedCreated;
 import com.devin.dev.entity.reply.Reply;
-import com.devin.dev.entity.reply.ReplyImage;
-import com.devin.dev.entity.reply.ReplyStatus;
 import com.devin.dev.entity.user.User;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -42,6 +40,7 @@ public class Post extends ModifiedCreated {
     @OneToMany(mappedBy = "post")
     private final List<PostImage> images = new ArrayList<>();
 
+    @Setter
     @NotNull
     private  String title;
 
@@ -59,25 +58,39 @@ public class Post extends ModifiedCreated {
         this.content = content;
     }
 
-    public static Post createPostWithImages(User user, List<PostImage> images, String content) {
+    public static Post createPostWithImages(User user, String title, String content, List<PostTag> tags, List<PostImage> images) {
         Post post = new Post();
         post.setUser(user);
+        post.setTitle(title);
         post.setContent(content);
         post.setStatus(PostStatus.VIEWABLE);
 
+        setPostTags(tags, post);
         setPostImages(images, post);
 
         return post;
     }
 
-    public static void setPostImages(List<PostImage> images, Post post) {
+    private static void setPostTags(List<PostTag> tags, Post post) {
         post.images.clear();
-        for (PostImage image : images) {
-            setReplyImage(post, image);
+        for (PostTag tag : tags) {
+            setPostTag(post, tag);
         }
     }
 
-    private static void setReplyImage(Post post, PostImage image) {
+    private static void setPostTag(Post post, PostTag tag) {
+        post.tags.add(tag);
+        tag.setPost(post);
+    }
+
+    public static void setPostImages(List<PostImage> images, Post post) {
+        post.images.clear();
+        for (PostImage image : images) {
+            setPostImage(post, image);
+        }
+    }
+
+    private static void setPostImage(Post post, PostImage image) {
         post.images.add(image);
         image.setPost(post);
     }
@@ -97,7 +110,7 @@ public class Post extends ModifiedCreated {
     public void setImages(List<PostImage> newPostImages) {
         this.images.clear();
         for (PostImage image : newPostImages) {
-            setReplyImage(this, image);
+            setPostImage(this, image);
         }
     }
 }

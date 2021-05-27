@@ -132,12 +132,12 @@ class PostRepositoryTest {
 
         User userA = userRepository.findByName("A").get();
 
-        List<Post> postsA = postRepository.findPostByUser(userA);
+        List<Post> postsA = postRepository.findByUser(userA);
         assertThat(postsA).extracting("title").containsExactly("PostA1", "PostA2");
         assertThat(postsA).extracting("content").containsExactly("ContentA1", "ContentA2");
 
         User userD = userRepository.findByName("D").get();
-        List<Post> postsD = postRepository.findPostByUser(userD);
+        List<Post> postsD = postRepository.findByUser(userD);
 
         assertThat(postsD.size()).isEqualTo(0);
     }
