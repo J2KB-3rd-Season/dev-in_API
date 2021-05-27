@@ -72,13 +72,12 @@ public class Post extends ModifiedCreated {
     }
 
     private static void setPostTags(List<PostTag> tags, Post post) {
-        post.images.clear();
         for (PostTag tag : tags) {
             setPostTag(post, tag);
         }
     }
 
-    private static void setPostTag(Post post, PostTag tag) {
+    public static void setPostTag(Post post, PostTag tag) {
         post.tags.add(tag);
         tag.setPost(post);
     }
@@ -96,15 +95,9 @@ public class Post extends ModifiedCreated {
     }
 
     public void setTags(List<PostTag> tags) {
-        this.images.clear();
         for (PostTag tag : tags) {
-            setTag(tag);
+            setPostTag(this, tag);
         }
-    }
-
-    public void setTag(PostTag tag) {
-        this.tags.add(tag);
-        tag.setPost(this);
     }
 
     public void setImages(List<PostImage> newPostImages) {

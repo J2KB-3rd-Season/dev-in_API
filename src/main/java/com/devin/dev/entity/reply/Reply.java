@@ -55,11 +55,6 @@ public class Reply extends ModifiedCreated {
         return reply;
     }
 
-    public static void setReplyImage(Reply reply, ReplyImage replyImage) {
-        reply.images.add(replyImage);
-        replyImage.setReply(reply);
-    }
-
     public static Reply createReplyWithImages(Post post, User user, List<ReplyImage> images, String content) {
         Reply reply = new Reply();
         reply.setPost(post);
@@ -72,10 +67,22 @@ public class Reply extends ModifiedCreated {
         return reply;
     }
 
+    public static void setReplyImage(Reply reply, ReplyImage replyImage) {
+        reply.images.add(replyImage);
+        replyImage.setReply(reply);
+    }
+
     public static void setReplyImages(List<ReplyImage> images, Reply reply) {
         reply.images.clear();
         for (ReplyImage image : images) {
             setReplyImage(reply, image);
+        }
+    }
+
+    public void setImages(List<ReplyImage> images) {
+        this.images.clear();
+        for (ReplyImage image : images) {
+            setReplyImage(this, image);
         }
     }
 
@@ -88,12 +95,5 @@ public class Reply extends ModifiedCreated {
 
     public void cancelLike(ReplyLike replyLike) {
         this.likes.remove(replyLike);
-    }
-
-    public void setImages(List<ReplyImage> images) {
-        this.images.clear();
-        for (ReplyImage image : images) {
-            setReplyImage(this, image);
-        }
     }
 }

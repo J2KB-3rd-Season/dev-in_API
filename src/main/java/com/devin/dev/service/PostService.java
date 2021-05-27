@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -56,18 +57,31 @@ public class PostService {
 
     // 게시글 수정
     @Transactional
-    Long editReply(Long userId, Long postId, String content, List<String> imagePaths) {
+    Long editReply(Long userId, Long postId, String content, List<String> tags, List<String> imagePaths) {
         // 엔티티 조회. 실패시 IllegalArgumentException
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유저 조회 실패"));
         Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("게시글 조회 실패"));
+        List<Subject> postSubjects = subjectRepository.findByNameIn(tags);
+        List<PostTag> existTags = postTagRepository.findByTagIn(postSubjects);
 
-        // 기존 이미지 경로 삭제
+        // 기존 태그 및 이미지 경로 삭제
+        List<PostTag> postTags = postTagRepository.findByPost(post);
+        postTagRepository.deleteInBatch(postTags);
         List<PostImage> postImages = postImageRepository.findByPost(post);
         postImageRepository.deleteInBatch(postImages);
 
         // 수정된 내용 반영
         List<PostImage> newPostImages = PostImage.createPostImages(imagePaths);
         post.setContent(content);
+        List<PostTag> newTags = new ArrayList<>();
+        for (Subject subject : postSubjects) {
+            for (PostTag existTag : existTags) {
+                if(existTag.getTag() != subject) {
+                    newTags.add(new PostTag(subject));
+                }
+            }
+        }
+        post.setTags(newTags);
         post.setImages(newPostImages);
 
         // 저장
