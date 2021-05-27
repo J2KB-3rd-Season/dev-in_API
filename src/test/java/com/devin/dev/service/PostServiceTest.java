@@ -45,11 +45,12 @@ class PostServiceTest {
         User postUser = new User("D", "d@b.com", "passD", "0004", UserStatus.ACTIVE);
         em.persist(postUser);
 
-        postService.post(postUser.getId(), "titleA1", "postA1", List.of("s1", "s2", "s3") ,List.of("p1", "p2", "p3"));
+        postService.post(postUser.getId(), "titleA1", "postA1", List.of("s1", "s2") ,List.of("p1", "p2", "p3"));
 
         List<Post> posts = postRepository.findByTitle("titleA1");
 
         assertThat(posts).extracting("title").containsExactly("titleA1");
+        assertThat(posts.get(0).getTags()).extracting("tag").containsExactly(subject1, subject2);
         assertThat(posts.get(0).getImages()).extracting("path").containsExactly("p1", "p2", "p3");
     }
 }

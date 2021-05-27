@@ -7,6 +7,7 @@ import com.devin.dev.entity.post.Subject;
 import com.devin.dev.entity.user.User;
 import com.devin.dev.repository.post.PostImageRepository;
 import com.devin.dev.repository.post.PostRepository;
+import com.devin.dev.repository.post.PostTagRepository;
 import com.devin.dev.repository.reply.ReplyRepository;
 import com.devin.dev.repository.reply.ReplyImageRepository;
 import com.devin.dev.repository.reply.ReplyLikeRepository;
@@ -25,6 +26,7 @@ public class PostService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final PostImageRepository postImageRepository;
+    private final PostTagRepository postTagRepository;
     private final SubjectRepository subjectRepository;
     private final ReplyRepository replyRepository;
     private final ReplyImageRepository replyImageRepository;
@@ -47,6 +49,7 @@ public class PostService {
         // 저장
         postRepository.save(post);
         postImageRepository.saveAll(postImages);
+        postTagRepository.saveAll(postTags);
 
         return post.getId();
     }
