@@ -94,7 +94,7 @@ public class PostService {
         System.out.println("deleteList = " + deleteList);
         System.out.println("newPostTags = " + newPostTags);
         post.setPostTags(newPostTags);
-        post.setImages(newPostImages);
+        post.setPostImages(newPostImages);
 
         // 저장
         postImageRepository.saveAll(newPostImages);

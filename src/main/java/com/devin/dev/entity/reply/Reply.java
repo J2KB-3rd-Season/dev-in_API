@@ -62,7 +62,7 @@ public class Reply extends ModifiedCreated {
         reply.setContent(content);
         reply.setStatus(ReplyStatus.VIEWABLE);
 
-        setReplyImages(images, reply);
+        setReplyImages(reply, images);
 
         return reply;
     }
@@ -72,7 +72,7 @@ public class Reply extends ModifiedCreated {
         replyImage.setReply(reply);
     }
 
-    private static void setReplyImages(List<ReplyImage> images, Reply reply) {
+    private static void setReplyImages(Reply reply, List<ReplyImage> images) {
         reply.images.clear();
         for (ReplyImage image : images) {
             setReplyImage(reply, image);
@@ -80,7 +80,7 @@ public class Reply extends ModifiedCreated {
     }
 
     public void setReplyImages(List<ReplyImage> images) {
-        setReplyImages(images, this);
+        setReplyImages(this, images);
     }
 
     public ReplyLike like(User user, ReplyLike replyLike) {

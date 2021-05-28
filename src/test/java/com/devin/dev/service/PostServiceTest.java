@@ -69,7 +69,7 @@ class PostServiceTest {
         List<PostTag> postTags = PostTag.createPostTags(List.of(subject1, subject2));
         post1.setPostTags(postTags);
         List<PostImage> postImages = PostImage.createPostImages(List.of("p1", "p2", "p3"));
-        post1.setImages(postImages);
+        post1.setPostImages(postImages);
         postTags.forEach(em::persist);
         postImages.forEach(em::persist);
         em.persist(post1);
