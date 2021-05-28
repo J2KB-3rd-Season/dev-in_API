@@ -2,6 +2,7 @@ package com.devin.dev.entity.user;
 
 import com.devin.dev.entity.base.Created;
 import com.devin.dev.entity.post.Post;
+import com.devin.dev.entity.post.PostTag;
 import com.devin.dev.entity.reply.Reply;
 import com.devin.dev.entity.service.CustomerService;
 import lombok.AccessLevel;
@@ -71,11 +72,24 @@ public class User extends Created {
         this.exp = 0L;
     }
 
+    private static void setUserInterest(User user, UserInterest interest) {
+        user.interests.add(interest);
+        interest.setUser(user);
+    }
+
+    private static void setUserInterests(User user, List<UserInterest> interests) {
+        for (UserInterest interest : interests) {
+            setUserInterest(user, interest);
+        }
+    }
+
+    public void setUserInterests(List<UserInterest> interests) {
+        setUserInterests(this, interests);
+    }
+
     public void changeExp(ExpChangeType type) {
         this.exp += type.getChange();
     }
-
-
 
     public enum ExpChangeType {
         CREATE_POST(1),

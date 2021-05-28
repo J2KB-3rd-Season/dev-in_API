@@ -4,6 +4,7 @@ import com.devin.dev.entity.post.Subject;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ public class UserInterest {
     @JoinColumn(name = "subject_id")
     private Subject interest;
 
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
