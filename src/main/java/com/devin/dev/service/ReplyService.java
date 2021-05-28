@@ -69,7 +69,7 @@ public class ReplyService {
         // 수정된 내용 반영
         List<ReplyImage> newReplyImages = ReplyImage.createReplyImages(imagePaths);
         reply.setContent(content);
-        reply.setImages(newReplyImages);
+        reply.setReplyImages(newReplyImages);
 
         // 저장
         replyImageRepository.saveAll(newReplyImages);

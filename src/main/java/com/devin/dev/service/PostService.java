@@ -93,7 +93,7 @@ public class PostService {
 
         System.out.println("deleteList = " + deleteList);
         System.out.println("newPostTags = " + newPostTags);
-        post.setTags(newPostTags);
+        post.setPostTags(newPostTags);
         post.setImages(newPostImages);
 
         // 저장

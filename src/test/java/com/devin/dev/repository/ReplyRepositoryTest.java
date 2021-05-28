@@ -19,7 +19,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.test.annotation.Rollback;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -129,7 +128,7 @@ class ReplyRepositoryTest {
             for (ReplyImage replyImage : replyImages) {
                 em.persist(replyImage);
             }
-            reply.setImages(replyImages);
+            reply.setReplyImages(replyImages);
             em.persist(reply);
         }
 

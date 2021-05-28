@@ -7,20 +7,16 @@ import com.devin.dev.entity.post.Subject;
 import com.devin.dev.entity.user.User;
 import com.devin.dev.entity.user.UserStatus;
 import com.devin.dev.repository.post.PostRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
 @SpringBootTest
@@ -71,7 +67,7 @@ class PostServiceTest {
 
         Post post1 = new Post(postUser, "PostC1", "ContentC1");
         List<PostTag> postTags = PostTag.createPostTags(List.of(subject1, subject2));
-        post1.setTags(postTags);
+        post1.setPostTags(postTags);
         List<PostImage> postImages = PostImage.createPostImages(List.of("p1", "p2", "p3"));
         post1.setImages(postImages);
         postTags.forEach(em::persist);

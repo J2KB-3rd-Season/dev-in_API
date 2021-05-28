@@ -17,7 +17,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.test.annotation.Rollback;
 
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
@@ -64,11 +63,11 @@ class PostRepositoryTest {
 
         User userA = new User("A", "a@b.com", "passA", "0001", UserStatus.ACTIVE);
         Post postA1 = new Post(userA, "PostA1", "ContentA1");
-        postA1.setTags(List.of(postTagA1_1, postTagA1_2, postTagA1_3));
+        postA1.setPostTags(List.of(postTagA1_1, postTagA1_2, postTagA1_3));
         Post postA2 = new Post(userA, "PostA2", "ContentA2");
-        postA2.setTags(List.of(postTagA2_2));
+        postA2.setPostTags(List.of(postTagA2_2));
         Post postA3 = new Post(userA, "PostA3", "ContentA3");
-        postA3.setTags(List.of(postTagA3_3));
+        postA3.setPostTags(List.of(postTagA3_3));
         userA.getPosts().add(postA1);
         userA.getPosts().add(postA2);
         userA.getPosts().add(postA3);

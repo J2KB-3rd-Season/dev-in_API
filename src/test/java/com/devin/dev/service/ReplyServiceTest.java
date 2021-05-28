@@ -142,7 +142,7 @@ class ReplyServiceTest {
         ReplyImage replyImage2 = new ReplyImage("i2");
         ReplyImage replyImage3 = new ReplyImage("i3");
 
-        Reply.setReplyImages(List.of(replyImage1, replyImage2, replyImage3), reply);
+        reply.setReplyImages(List.of(replyImage1, replyImage2, replyImage3));
 
         em.persist(replyImage1);
         em.persist(replyImage2);
