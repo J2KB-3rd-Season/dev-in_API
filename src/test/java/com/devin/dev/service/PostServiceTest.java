@@ -36,7 +36,6 @@ class PostServiceTest {
     PostRepository postRepository;
 
     @Test
-    @Rollback(false)
     void postTest() {
         Subject subject1 = new Subject("s1");
         Subject subject2 = new Subject("s2");
@@ -59,7 +58,6 @@ class PostServiceTest {
     }
 
     @Test
-    @Rollback(false)
     void editPostTest() {
         Subject subject1 = new Subject("s1");
         Subject subject2 = new Subject("s2");

@@ -69,7 +69,6 @@ class ReplyRepositoryTest {
     }
 
     @Test
-    @Rollback(false)
     void viewFirstPageReply() {
         User userD = new User("D", "d@b.com", "passD", "0004", UserStatus.ACTIVE);
         Post postD1 = new Post(userD, "PostC1", "ContentC1");
@@ -117,7 +116,6 @@ class ReplyRepositoryTest {
     }
 
     @Test
-    @Rollback(false)
     void viewFirstPageReplyDto() {
         User userD = new User("D", "d@b.com", "passD", "0004", UserStatus.ACTIVE);
         Post postD1 = new Post(userD, "PostC1", "ContentC1");
@@ -190,7 +188,6 @@ class ReplyRepositoryTest {
     }
 
     @Test
-    @Rollback(false)
     void replyLike() {
         User postUser = new User("D", "d@b.com", "passD", "0004", UserStatus.ACTIVE);
         User replyUser = new User("E", "e@b.com", "passE", "0005", UserStatus.ACTIVE);
@@ -243,7 +240,6 @@ class ReplyRepositoryTest {
     }
 
     @Test
-    @Rollback(false)
     void replyCancelLike() {
         User postUser = new User("D", "d@b.com", "passD", "0004", UserStatus.ACTIVE);
         User replyUser = new User("E", "e@b.com", "passE", "0005", UserStatus.ACTIVE);

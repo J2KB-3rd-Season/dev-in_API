@@ -117,8 +117,8 @@ class PostRepositoryTest {
         Pageable pageable = PageRequest.of(0, 4);
         Page<String> postNamesA = postRepository.findPostnamePageByUser(userA, pageable);
 
-        assertThat(postNamesA.getTotalElements()).isEqualTo(2);
-        assertThat(postNamesA).containsExactly("PostA1", "PostA2");
+        assertThat(postNamesA.getTotalElements()).isEqualTo(3);
+        assertThat(postNamesA).containsExactly("PostA1", "PostA2", "PostA3");
 
         User userD = userRepository.findByName("D").get();
 
@@ -133,8 +133,8 @@ class PostRepositoryTest {
         User userA = userRepository.findByName("A").get();
 
         List<Post> postsA = postRepository.findByUser(userA);
-        assertThat(postsA).extracting("title").containsExactly("PostA1", "PostA2");
-        assertThat(postsA).extracting("content").containsExactly("ContentA1", "ContentA2");
+        assertThat(postsA).extracting("title").containsExactly("PostA1", "PostA2", "PostA3");
+        assertThat(postsA).extracting("content").containsExactly("ContentA1", "ContentA2", "ContentA3");
 
         User userD = userRepository.findByName("D").get();
         List<Post> postsD = postRepository.findByUser(userD);
@@ -147,8 +147,8 @@ class PostRepositoryTest {
         User userA = userRepository.findByName("A").get();
 
         List<PostDto> postDtosA = postRepository.findPostDtoByUser(userA);
-        assertThat(postDtosA).extracting("title").containsExactly("PostA1", "PostA2");
-        assertThat(postDtosA).extracting("content").containsExactly("ContentA1", "ContentA2");
+        assertThat(postDtosA).extracting("title").containsExactly("PostA1", "PostA2", "PostA3");
+        assertThat(postDtosA).extracting("content").containsExactly("ContentA1", "ContentA2", "ContentA3");
 
         User userD = userRepository.findByName("D").get();
         List<PostDto> postDtosD = postRepository.findPostDtoByUser(userD);
@@ -157,7 +157,6 @@ class PostRepositoryTest {
     }
 
     @Test
-    @Rollback(false)
     void findPostDtoPageWithCondition() {
         PostSearchCondition condition = new PostSearchCondition();
         condition.setTags(List.of("s1", "s2", "s"));
