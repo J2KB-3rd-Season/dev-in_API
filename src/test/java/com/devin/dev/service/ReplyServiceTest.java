@@ -6,6 +6,7 @@ import com.devin.dev.entity.reply.ReplyImage;
 import com.devin.dev.entity.reply.ReplyLike;
 import com.devin.dev.entity.user.User;
 import com.devin.dev.entity.user.UserStatus;
+import com.devin.dev.repository.post.PostRepository;
 import com.devin.dev.repository.reply.ReplyRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,9 @@ class ReplyServiceTest {
 
     @Autowired
     ReplyRepository replyRepository;
+
+    @Autowired
+    PostRepository postRepository;
 
     @Test
     void replyTest() {

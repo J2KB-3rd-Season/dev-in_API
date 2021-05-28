@@ -78,6 +78,7 @@ public class User extends Created {
     }
 
     private static void setUserInterests(User user, List<UserInterest> interests) {
+        user.interests.clear();
         for (UserInterest interest : interests) {
             setUserInterest(user, interest);
         }

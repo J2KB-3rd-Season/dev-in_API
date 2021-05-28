@@ -1,5 +1,5 @@
 package com.devin.dev.entity.reply;
 
 public enum ReplyStatus {
-    VIEWABLE, DELETED, SELECTED
+    NOT_CHOSEN, CHOSEN, DELETED
 }

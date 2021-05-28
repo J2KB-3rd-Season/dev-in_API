@@ -50,7 +50,7 @@ public class Reply extends ModifiedCreated {
         reply.setPost(post);
         reply.setUser(user);
         reply.setContent(content);
-        reply.setStatus(ReplyStatus.VIEWABLE);
+        reply.setStatus(ReplyStatus.NOT_CHOSEN);
 
         return reply;
     }
@@ -60,7 +60,7 @@ public class Reply extends ModifiedCreated {
         reply.setPost(post);
         reply.setUser(user);
         reply.setContent(content);
-        reply.setStatus(ReplyStatus.VIEWABLE);
+        reply.setStatus(ReplyStatus.NOT_CHOSEN);
 
         setReplyImages(reply, images);
 
