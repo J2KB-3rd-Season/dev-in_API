@@ -7,6 +7,7 @@ import com.devin.dev.entity.service.CustomerService;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -41,13 +42,19 @@ public class User extends Created {
     private final List<Career> careers = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
-    private final List<UserSNS> sns = new ArrayList<>();
+    private final List<UserSns> sns = new ArrayList<>();
 
+    @Setter
     private String name;
+    @Setter
     private String email;
+
     private String password;
-    private String phone_number;
     private Long exp;
+
+    @Setter
+    private String phone_number;
+    @Setter
     private String profile;
 
     @Enumerated(EnumType.STRING)
@@ -67,6 +74,8 @@ public class User extends Created {
     public void changeExp(ExpChangeType type) {
         this.exp += type.getChange();
     }
+
+
 
     public enum ExpChangeType {
         CREATE_POST(1),
@@ -96,5 +105,4 @@ public class User extends Created {
             return change;
         }
     }
-
 }

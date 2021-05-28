@@ -1,9 +1,11 @@
 package com.devin.dev.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
+import lombok.Data;
 
 import java.util.List;
 
+@Data
 public class PostReplyDto {
 
     private Long postId;
