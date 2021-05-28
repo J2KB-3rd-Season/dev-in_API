@@ -97,7 +97,6 @@ class PostServiceTest {
         assertThat(post.getUser().getExp()).isEqualTo(0);
 
 
-
         postService.editPost(postUser.getId(), post1.getId(), "PostC3","EditedC2", List.of("s3", "s2"), List.of("p4", "p3", "p1", "p2"));
         em.flush();
         post = postRepository.findById(post1.getId()).get();
