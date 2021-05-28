@@ -132,6 +132,7 @@ class ReplyServiceTest {
     }
 
     @Test
+    @Rollback(false)
     void editReplyTest() {
         User postUser = new User("D", "d@b.com", "passD", "0004", UserStatus.ACTIVE);
         User replyUser = new User("E", "e@b.com", "passE", "0005", UserStatus.ACTIVE);

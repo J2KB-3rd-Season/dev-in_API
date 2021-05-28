@@ -15,7 +15,6 @@ public class ReplyImage {
     @Column(name = "image_id")
     private Long id;
 
-    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reply_id")
     private Reply reply;
@@ -36,6 +35,14 @@ public class ReplyImage {
         }
 
         return replyImages;
+    }
+
+    public void setReply(Reply reply) {
+        if(this.reply != null) {
+            this.reply.getImages().remove(this);
+        }
+        this.reply = reply;
+        reply.getImages().add(this);
     }
 
 }

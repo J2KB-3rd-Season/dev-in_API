@@ -19,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.annotation.Rollback;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -176,6 +177,7 @@ class ReplyRepositoryTest {
         List<ReplyImage> replyImages = ReplyImage.createReplyImages(List.of("i1", "i2", "i3"));
         Reply reply = Reply.createReplyWithImages(postD1, userD, replyImages, "reply_content");
 
+        replyImages.forEach(em::persist);
         em.persist(reply);
 
         Reply foundReply = replyRepository.findById(reply.getId()).orElseThrow(IllegalStateException::new);

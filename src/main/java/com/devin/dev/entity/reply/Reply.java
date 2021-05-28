@@ -22,7 +22,7 @@ public class Reply extends ModifiedCreated {
     @Column(name = "reply_id")
     private Long id;
 
-    @Setter
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
@@ -67,8 +67,15 @@ public class Reply extends ModifiedCreated {
         return reply;
     }
 
+    public void setPost(Post post) {
+        if(this.post != null) {
+            this.post.getReplies().remove(this);
+        }
+        this.post = post;
+        post.getReplies().add(this);
+    }
+
     private static void setReplyImage(Reply reply, ReplyImage replyImage) {
-        reply.images.add(replyImage);
         replyImage.setReply(reply);
     }
 
