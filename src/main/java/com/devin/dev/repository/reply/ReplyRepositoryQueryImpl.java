@@ -4,12 +4,11 @@ import com.devin.dev.dto.QReplyLikeDto;
 import com.devin.dev.dto.ReplyLikeDto;
 import com.devin.dev.dto.reply.QReplyDto;
 import com.devin.dev.dto.reply.ReplyDto;
-import com.devin.dev.entity.reply.QReplyImage;
-import com.devin.dev.entity.reply.Reply;
-import com.devin.dev.entity.reply.ReplyLike;
+import com.devin.dev.entity.reply.*;
 import com.devin.dev.entity.user.QUser;
 import com.devin.dev.entity.user.User;
 import com.querydsl.core.QueryResults;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.ListPath;
 import com.querydsl.core.types.dsl.StringExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -19,8 +18,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import javax.persistence.EntityManager;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.devin.dev.entity.reply.QReply.reply;
@@ -46,14 +47,7 @@ public class ReplyRepositoryQueryImpl implements ReplyRepositoryQuery {
      */
     @Override
     public Page<Reply> findReplyPageByPost(Long postId, Pageable pageable) {
-        QueryResults<Reply> results = queryFactory
-                .select(reply)
-                .from(reply)
-                .where(reply.post.id.eq(postId))
-                .orderBy(reply.lastModifiedDate.asc())
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetchResults();
+        QueryResults<Reply> results = getReplyByPostAndPageable(postId, pageable);
 
         List<Reply> content = results.getResults();
         long total = results.getTotal();
@@ -63,25 +57,40 @@ public class ReplyRepositoryQueryImpl implements ReplyRepositoryQuery {
 
     @Override
     public Page<ReplyDto> findReplyDtoPageByPost(Long postId, Pageable pageable) {
-        QueryResults<ReplyDto> results = queryFactory
-                .select(new QReplyDto(
-                        user.name,
-                        reply.content,
-                        reply.status,
-                        reply.likes.size()
-                ))
+        QueryResults<Reply> results = getReplyByPostAndPageable(postId, pageable);
+
+        List<Reply> tuples = results.getResults();
+        long total = results.getTotal();
+
+        List<ReplyDto> replyDtos = new ArrayList<>();
+
+        for (Reply tuple : tuples) {
+            String username = tuple.getUser().getName();
+            String content = tuple.getContent();
+            ReplyStatus status = tuple.getStatus();
+            Integer like = tuple.getLikes().size();
+            List<ReplyImage> replyImages = tuple.getImages();
+            List<String> images = new ArrayList<>();
+            if(replyImages != null) {
+                images = replyImages.stream().map(ReplyImage::getPath).collect(Collectors.toList());
+            }
+            ReplyDto replyDto = new ReplyDto(username, content, status, like);
+            replyDto.setImages(images);
+            replyDtos.add(replyDto);
+        }
+
+        return new PageImpl<>(replyDtos, pageable, total);
+    }
+
+    private QueryResults<Reply> getReplyByPostAndPageable(Long postId, Pageable pageable) {
+        return queryFactory
+                .select(reply)
                 .from(reply)
-                .leftJoin(reply.user, user)
                 .where(reply.post.id.eq(postId))
                 .orderBy(reply.lastModifiedDate.asc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetchResults();
-
-        List<ReplyDto> content = results.getResults();
-        long total = results.getTotal();
-
-        return new PageImpl<>(content, pageable, total);
     }
 
     @Override
