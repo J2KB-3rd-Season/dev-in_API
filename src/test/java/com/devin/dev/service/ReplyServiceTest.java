@@ -111,7 +111,7 @@ class ReplyServiceTest {
         em.persist(reply);
 
         ReplyLike replyLike = new ReplyLike();
-        replyLike.setReply(reply);
+        replyLike.changeReply(reply);
         replyLike.setUser(likeUser);
         em.persist(replyLike);
 

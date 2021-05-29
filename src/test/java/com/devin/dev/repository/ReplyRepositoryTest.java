@@ -13,6 +13,7 @@ import com.devin.dev.repository.post.PostRepository;
 import com.devin.dev.repository.reply.ReplyRepository;
 import com.devin.dev.repository.reply.ReplyLikeRepository;
 import com.devin.dev.repository.user.UserRepository;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -146,6 +147,63 @@ class ReplyRepositoryTest {
                         "reply_content2",
                         "reply_content3"
                 );
+
+        List<Reply> allReplies = replyRepository.findByPost(postD1);
+
+        assertThat(allReplies)
+                .extracting("content")
+                .containsExactly(
+                        "reply_content0",
+                        "reply_content1",
+                        "reply_content2",
+                        "reply_content3",
+                        "reply_content4",
+                        "reply_content5",
+                        "reply_content6",
+                        "reply_content7",
+                        "reply_content8",
+                        "reply_content9"
+                );
+
+        assertThat(allReplies).allMatch(r -> r.getUser().getId().equals(userD.getId()));
+    }
+
+    @Test
+    @Rollback(false)
+    void replyDtoMappingFromTuple() {
+        User userD = new User("D", "d@b.com", "passD", "0004", UserStatus.ACTIVE);
+        Post postD1 = new Post(userD, "PostC1", "ContentC1");
+
+        em.persist(userD);
+        em.persist(postD1);
+
+        for (int i = 0; i < 10; i++) {
+            Reply reply = Reply.createReply(postD1, userD, "reply_content" + i);
+            List<ReplyImage> replyImages = ReplyImage.createReplyImages(List.of("1i"+i, "2i"+i, "3i"+i));
+            for (ReplyImage replyImage : replyImages) {
+                em.persist(replyImage);
+            }
+            reply.setReplyImages(replyImages);
+            em.persist(reply);
+        }
+
+        Pageable pageable = PageRequest.of(0, 4);
+
+        Page<ReplyDto> replyDtos = replyRepository.findReplyDtoPageByPost(postD1.getId(), pageable);
+
+        assertThat(replyDtos)
+                .extracting("content")
+                .containsExactly(
+                        "reply_content0",
+                        "reply_content1",
+                        "reply_content2",
+                        "reply_content3"
+                );
+
+        List<ReplyDto> content = replyDtos.getContent();
+        for (int i = 0; i < content.size(); i++) {
+            assertThat(content.get(i).getImages()).containsExactly("1i"+i, "2i"+i, "3i"+i);
+        }
 
         List<Reply> allReplies = replyRepository.findByPost(postD1);
 
@@ -310,4 +368,5 @@ class ReplyRepositoryTest {
                         replyLikeUser4.getName()
                 );
     }
+
 }
