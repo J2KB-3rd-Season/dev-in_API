@@ -19,7 +19,6 @@ public class ReplyLike extends Created {
     @Column(name = "like_id")
     private Long id;
 
-    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reply_id")
     private Reply reply;
@@ -28,4 +27,13 @@ public class ReplyLike extends Created {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    public void changeReply(Reply reply) {
+        if(this.reply != null) {
+            this.reply.getLikes().remove(this);
+        } else {
+            this.reply = reply;
+            reply.getLikes().add(this);
+        }
+    }
 }

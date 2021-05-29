@@ -91,9 +91,8 @@ public class Reply extends ModifiedCreated {
     }
 
     public ReplyLike like(User user, ReplyLike replyLike) {
-        replyLike.setReply(this);
+        replyLike.changeReply(this);
         replyLike.setUser(user);
-        this.likes.add(replyLike);
         return replyLike;
     }
 
