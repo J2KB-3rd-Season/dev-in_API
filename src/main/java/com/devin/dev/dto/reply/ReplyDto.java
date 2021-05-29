@@ -19,16 +19,17 @@ public class ReplyDto {
 
     private String name;
     private String content;
-    private List<String> images = new ArrayList<>();
     private ReplyStatus status;
+    private int like;
+    private List<String> images = new ArrayList<>();
 
 
 
     @QueryProjection
-    public ReplyDto(String name, String content, List<String> images, ReplyStatus status) {
+    public ReplyDto(String name, String content, ReplyStatus status, int like) {
         this.name = name;
         this.content = content;
-        this.images = images;
         this.status = status;
+        this.like = like;
     }
 }

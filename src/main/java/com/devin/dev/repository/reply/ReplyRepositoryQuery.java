@@ -16,6 +16,8 @@ public interface ReplyRepositoryQuery {
 
     Page<Reply> findReplyPageByPost(Long postId, Pageable pageable);
 
+    Page<ReplyDto> findReplyDtoPageByPost(Long postId, Pageable pageable);
+
     Optional<ReplyLikeDto> findReplyLikeByReplyAndUser(Long replyId, User user);
 
     List<ReplyLikeDto> findReplyLikesById(Long replyId);

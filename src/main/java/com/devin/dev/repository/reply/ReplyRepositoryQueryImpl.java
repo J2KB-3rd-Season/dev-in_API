@@ -7,8 +7,11 @@ import com.devin.dev.dto.reply.ReplyDto;
 import com.devin.dev.entity.reply.QReplyImage;
 import com.devin.dev.entity.reply.Reply;
 import com.devin.dev.entity.reply.ReplyLike;
+import com.devin.dev.entity.user.QUser;
 import com.devin.dev.entity.user.User;
 import com.querydsl.core.QueryResults;
+import com.querydsl.core.types.dsl.ListPath;
+import com.querydsl.core.types.dsl.StringExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -21,7 +24,9 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static com.devin.dev.entity.reply.QReply.reply;
+import static com.devin.dev.entity.reply.QReplyImage.replyImage;
 import static com.devin.dev.entity.reply.QReplyLike.replyLike;
+import static com.devin.dev.entity.user.QUser.user;
 
 // 세부 쿼리 구현
 @RequiredArgsConstructor
@@ -51,6 +56,29 @@ public class ReplyRepositoryQueryImpl implements ReplyRepositoryQuery {
                 .fetchResults();
 
         List<Reply> content = results.getResults();
+        long total = results.getTotal();
+
+        return new PageImpl<>(content, pageable, total);
+    }
+
+    @Override
+    public Page<ReplyDto> findReplyDtoPageByPost(Long postId, Pageable pageable) {
+        QueryResults<ReplyDto> results = queryFactory
+                .select(new QReplyDto(
+                        user.name,
+                        reply.content,
+                        reply.status,
+                        reply.likes.size()
+                ))
+                .from(reply)
+                .leftJoin(reply.user, user)
+                .where(reply.post.id.eq(postId))
+                .orderBy(reply.lastModifiedDate.asc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetchResults();
+
+        List<ReplyDto> content = results.getResults();
         long total = results.getTotal();
 
         return new PageImpl<>(content, pageable, total);
