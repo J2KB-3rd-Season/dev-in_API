@@ -3,6 +3,7 @@ package com.devin.dev.repository;
 import com.devin.dev.entity.user.User;
 import com.devin.dev.entity.user.UserStatus;
 import com.devin.dev.repository.user.UserRepository;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,9 +13,10 @@ import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -84,5 +86,18 @@ class UserRepositoryTest {
         assertThat(allUsers).extracting("name").containsExactly("A", "B", "C", "D");
     }
 
+    @Test
+    void findByEmailAndPassword() {
+        User userA = new User("A", "a@b.com", "passA", "0001", UserStatus.ACTIVE);
+        em.persist(userA);
+        User userB = new User("B", "b@b.com", "passB", "0002", UserStatus.DELETED);
+        em.persist(userB);
+
+        Optional<User> foundUserA = userRepository.findByEmailEqualsAndPassword("a@b.com", "passA");
+        Optional<User> foundUserB = userRepository.findByEmailEqualsAndPassword("b@b.com", "wrongPass");
+
+        assertThat(foundUserA.get().getName()).isEqualTo("A");
+        assertThatThrownBy(() -> foundUserB.get().getName()).isInstanceOf(NoSuchElementException.class);
+    }
 
 }
