@@ -1,7 +1,6 @@
 package com.devin.dev.controller.reply;
 
 import com.devin.dev.dto.reply.ReplyDto;
-import com.devin.dev.entity.reply.Reply;
 import com.devin.dev.service.ReplyService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,7 +29,7 @@ public class ReplyController {
     @GetMapping("/reply/{id}")
     public Page<ReplyDto> findReplies(
             @PathVariable("id") Long postId, Pageable pageable) {
-        return replyService.searchReplyDtos(postId, pageable);
+        return replyService.findRepliesInPost(postId, pageable);
     }
 
     @Data

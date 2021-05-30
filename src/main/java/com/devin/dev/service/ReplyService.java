@@ -112,7 +112,7 @@ public class ReplyService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ReplyDto> searchReplyDtos(Long postId, Pageable pageable) {
+    public Page<ReplyDto> findRepliesInPost(Long postId, Pageable pageable) {
         Page<Reply> replies = replyRepository.findReplyPageByPost(postId, pageable);
         List<ReplyDto> replyDtos = ReplyMapper.toDtos(replies.toList());
 
