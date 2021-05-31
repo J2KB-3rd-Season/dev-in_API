@@ -6,7 +6,10 @@ import com.devin.dev.entity.post.PostTag;
 import com.devin.dev.entity.post.Subject;
 import com.devin.dev.entity.user.User;
 import com.devin.dev.entity.user.UserStatus;
+import com.devin.dev.model.DefaultResponse;
 import com.devin.dev.repository.post.PostRepository;
+import com.devin.dev.utils.ResponseMessage;
+import com.devin.dev.utils.StatusCode;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,7 +35,7 @@ class PostServiceTest {
     PostRepository postRepository;
 
     @Test
-    void postTest() {
+    void postSucceeded() {
         Subject subject1 = new Subject("s1");
         Subject subject2 = new Subject("s2");
         Subject subject3 = new Subject("s3");
@@ -43,7 +46,9 @@ class PostServiceTest {
         User postUser = new User("D", "d@b.com", "passD", "0004", UserStatus.ACTIVE);
         em.persist(postUser);
 
-        postService.post(postUser.getId(), "titleA1", "postA1", List.of("s1", "s2") ,List.of("p1", "p2", "p3"));
+        DefaultResponse<?> response = postService.post(postUser.getId(), "titleA1", "postA1", List.of("s1", "s2"), List.of("p1", "p2", "p3"));
+        assertThat(response.getStatusCode()).isEqualTo(StatusCode.OK);
+        assertThat(response.getResponseMessage()).isEqualTo(ResponseMessage.POST_UPLOAD_SUCCESS);
 
         List<Post> posts = postRepository.findByTitle("titleA1");
 
@@ -51,6 +56,23 @@ class PostServiceTest {
         assertThat(posts.get(0).getTags()).extracting("tag").containsExactly(subject1, subject2);
         assertThat(posts.get(0).getImages()).extracting("path").containsExactly("p1", "p2", "p3");
         assertThat(posts.get(0).getUser().getExp()).isEqualTo(1);
+    }
+
+    @Test
+    void postFailed() {
+        Subject subject1 = new Subject("s1");
+        Subject subject2 = new Subject("s2");
+        Subject subject3 = new Subject("s3");
+        em.persist(subject1);
+        em.persist(subject2);
+        em.persist(subject3);
+
+        User postUser = new User("D", "d@b.com", "passD", "0004", UserStatus.ACTIVE);
+        em.persist(postUser);
+
+        DefaultResponse<?> response = postService.post(9999L, "titleA1", "postA1", List.of("s1", "s2"), List.of("p1", "p2", "p3"));
+        assertThat(response.getStatusCode()).isEqualTo(StatusCode.BAD_REQUEST);
+        assertThat(response.getResponseMessage()).isEqualTo(ResponseMessage.NOT_FOUND_USER);
     }
 
     @Test
