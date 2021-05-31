@@ -1,5 +1,6 @@
 package com.devin.dev.entity.user;
 
+import com.devin.dev.dto.user.UserDetailsDto;
 import com.devin.dev.entity.base.Created;
 import com.devin.dev.entity.post.Post;
 import com.devin.dev.entity.post.PostTag;
@@ -69,6 +70,15 @@ public class User extends Created {
         this.password = password;
         this.phone_number = phone_number;
         this.status = status;
+        this.exp = 0L;
+    }
+
+    public User(UserDetailsDto userDto) {
+        this.name = userDto.getName();
+        this.email = userDto.getEmail();
+        this.password = userDto.getPassword();
+        this.phone_number = userDto.getPhone_number();
+        this.status = UserStatus.ACTIVE;
         this.exp = 0L;
     }
 
