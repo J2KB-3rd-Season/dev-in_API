@@ -7,11 +7,14 @@ import com.devin.dev.entity.reply.Reply;
 import com.devin.dev.entity.reply.ReplyImage;
 import com.devin.dev.entity.reply.ReplyLike;
 import com.devin.dev.entity.user.User;
+import com.devin.dev.model.DefaultResponse;
 import com.devin.dev.repository.post.PostRepository;
 import com.devin.dev.repository.reply.ReplyRepository;
 import com.devin.dev.repository.reply.ReplyImageRepository;
 import com.devin.dev.repository.reply.ReplyLikeRepository;
 import com.devin.dev.repository.user.UserRepository;
+import com.devin.dev.utils.ResponseMessage;
+import com.devin.dev.utils.StatusCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -20,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,10 +37,18 @@ public class ReplyService {
 
     // 답변 작성
     @Transactional
-    public Long reply(Long userId, Long postId, String content, List<String> imagePaths) throws IllegalArgumentException {
-        // 엔티티 조회. 실패시 IllegalArgumentException
-        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유저 조회 실패"));
-        Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("게시글 조회 실패"));
+    public DefaultResponse<ReplyDto> reply(Long userId, Long postId, String content, List<String> imagePaths) throws IllegalArgumentException {
+        // 엔티티 조회. 실패시 response 인스턴스 반환
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_FOUND_USER);
+        }
+        User user = userOptional.get();
+        Optional<Post> postOptional = postRepository.findById(postId);
+        if (postOptional.isEmpty()) {
+            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_FOUND_POST);
+        }
+        Post post = postOptional.get();
 
         // 엔티티 생성
         List<ReplyImage> replyImages = ReplyImage.createReplyImages(imagePaths);
@@ -51,15 +63,21 @@ public class ReplyService {
         replyRepository.save(reply);
         replyImageRepository.saveAll(replyImages);
 
-        // reply_id 리턴
-        return reply.getId();
+        // DTO 변환
+        ReplyDto replyDto = ReplyMapper.replyToReplyDto(reply);
+
+        // response 객체 리턴
+        return new DefaultResponse<>(StatusCode.OK, ResponseMessage.REPLY_UPLOAD_SUCCESS, replyDto);
     }
 
     // 답변 수정
     @Transactional
-    public Long editReply(Long userId, Long replyId, String content, List<String> imagePaths) {
+    public DefaultResponse<ReplyDto> editReply(Long userId, Long replyId, String content, List<String> imagePaths) {
         // 엔티티 조회. 실패시 IllegalArgumentException
-        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유저 조회 실패"));
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_FOUND_USER);
+        }
         Reply reply = replyRepository.findById(replyId).orElseThrow(() -> new IllegalArgumentException("답변 조회 실패"));
 
         // 기존 이미지 경로 삭제
@@ -75,7 +93,11 @@ public class ReplyService {
         replyImageRepository.saveAll(newReplyImages);
         replyRepository.save(reply);
 
-        return reply.getId();
+        // DTO 변환
+        ReplyDto replyDto = ReplyMapper.replyToReplyDto(reply);
+
+        // response 객체 리턴
+        return new DefaultResponse<>(StatusCode.OK, ResponseMessage.REPLY_EDIT_SUCCESS, replyDto);
     }
 
     // 좋아요 상태변경
