@@ -1,11 +1,13 @@
 package com.devin.dev.service;
 
+import com.devin.dev.dto.reply.ReplyDto;
 import com.devin.dev.entity.post.Post;
 import com.devin.dev.entity.reply.Reply;
 import com.devin.dev.entity.reply.ReplyImage;
 import com.devin.dev.entity.reply.ReplyLike;
 import com.devin.dev.entity.user.User;
 import com.devin.dev.entity.user.UserStatus;
+import com.devin.dev.model.DefaultResponse;
 import com.devin.dev.repository.post.PostRepository;
 import com.devin.dev.repository.reply.ReplyRepository;
 import org.junit.jupiter.api.Test;
@@ -45,9 +47,9 @@ class ReplyServiceTest {
         em.persist(post1);
         em.persist(replyUser);
 
-        Long replyId = replyService.reply(replyUser.getId(), post1.getId(), "reply_content", List.of("i1", "i2", "i3"));
+        DefaultResponse<ReplyDto> response = replyService.reply(replyUser.getId(), post1.getId(), "reply_content", List.of("i1", "i2", "i3"));
 
-        Reply foundReply = em.find(Reply.class, replyId);
+        Reply foundReply = em.find(Reply.class, response.getData().getId());
 
         // 답변 검증
         assertThat(foundReply.getImages()).extracting("path").containsExactly("i1", "i2", "i3");
@@ -154,10 +156,10 @@ class ReplyServiceTest {
         em.persist(replyImage3);
         em.persist(reply);
 
-        Long replyId = replyService.editReply(replyUser.getId(), reply.getId(), "edited_content", List.of("i3", "i1", "i2"));
+        DefaultResponse<ReplyDto> response = replyService.editReply(replyUser.getId(), reply.getId(), "edited_content", List.of("i3", "i1", "i2"));
 
 
-        Reply foundReply = em.find(Reply.class, replyId);
+        Reply foundReply = em.find(Reply.class, response.getData().getId());
 
 
         // 답변 검증

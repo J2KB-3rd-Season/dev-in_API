@@ -116,7 +116,7 @@ class UserServiceTest {
         DefaultResponse<?> response = userService.signIn(userDto);
 
         // 실패 response 객체 확인
-        assertThat(response.getResponseMessage()).isEqualTo(ResponseMessage.NOT_EXIST_EMAIL);
+        assertThat(response.getResponseMessage()).isEqualTo(ResponseMessage.NOT_FOUND_EMAIL);
         assertThat(response.getStatusCode()).isEqualTo(StatusCode.BAD_REQUEST);
     }
 
