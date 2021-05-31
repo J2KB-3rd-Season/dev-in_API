@@ -169,7 +169,6 @@ class ReplyRepositoryTest {
     }
 
     @Test
-    @Rollback(false)
     void replyDtoMappingFromTuple() {
         User userD = new User("D", "d@b.com", "passD", "0004", UserStatus.ACTIVE);
         Post postD1 = new Post(userD, "PostC1", "ContentC1");
