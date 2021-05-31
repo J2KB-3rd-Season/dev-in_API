@@ -8,13 +8,15 @@ import lombok.Data;
 public class UserSimpleDto {
 
     private String name;
-    private Long exp;
-    private UserStatus status;
+    private String email;
+    private String password;
+    private String phone_number;
 
     @QueryProjection
-    public UserSimpleDto(String name, Long exp, UserStatus status) {
+    public UserSimpleDto(String name, String email, String password, String phone_number) {
         this.name = name;
-        this.exp = exp;
-        this.status = status;
+        this.email = email;
+        this.password = password;
+        this.phone_number = phone_number;
     }
 }

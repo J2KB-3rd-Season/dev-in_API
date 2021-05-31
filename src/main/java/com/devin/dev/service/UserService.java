@@ -24,20 +24,20 @@ public class UserService {
     UserRepository userRepository;
 
     @Transactional
-    public DefaultResponse<?> signUp(UserDetailsDto userDetailsDto) {
+    public DefaultResponse<?> signUp(UserSimpleDto userDto) {
         // 엔티티 조회
-        Optional<User> foundUser = userRepository.findByEmailEquals(userDetailsDto.getEmail());
+        Optional<User> foundUser = userRepository.findByEmailEquals(userDto.getEmail());
         if(foundUser.isPresent()) {
             return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.EXIST_USER_MAIL);
         }
 
         // 비밀번호 암호화
-        String password = userDetailsDto.getPassword();
+        String password = userDto.getPassword();
         String encodePassword = passwordEncoder.encode(password);
-        userDetailsDto.setPassword(encodePassword);
+        userDto.setPassword(encodePassword);
 
         // 엔티티 생성 후 저장
-        User user = new User(userDetailsDto);
+        User user = new User(userDto);
         userRepository.save(user);
 
         return new DefaultResponse<>(StatusCode.OK, ResponseMessage.CREATED_USER);
