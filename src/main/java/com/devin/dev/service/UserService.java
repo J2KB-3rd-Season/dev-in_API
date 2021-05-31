@@ -46,7 +46,7 @@ public class UserService {
         // 엔티티 email 조회
         Optional<User> foundUser = userRepository.findByEmailEquals(userDto.getEmail());
         if(foundUser.isEmpty()) {
-            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_EXIST_EMAIL);
+            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_FOUND_EMAIL);
         }
 
         // 비밀번호 체크
