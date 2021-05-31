@@ -65,6 +65,7 @@ public class ReplyRepositoryQueryImpl implements ReplyRepositoryQuery {
         List<ReplyDto> replyDtos = new ArrayList<>();
 
         for (Reply tuple : tuples) {
+            Long id = tuple.getId();
             String username = tuple.getUser().getName();
             String content = tuple.getContent();
             ReplyStatus status = tuple.getStatus();
@@ -74,7 +75,7 @@ public class ReplyRepositoryQueryImpl implements ReplyRepositoryQuery {
             if(replyImages != null) {
                 images = replyImages.stream().map(ReplyImage::getPath).collect(Collectors.toList());
             }
-            ReplyDto replyDto = new ReplyDto(username, content, status, like);
+            ReplyDto replyDto = new ReplyDto(id, username, content, status, like);
             replyDto.setImages(images);
             replyDtos.add(replyDto);
         }
