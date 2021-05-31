@@ -5,6 +5,7 @@ import com.devin.dev.entity.post.PostImage;
 import com.devin.dev.entity.post.PostTag;
 import com.devin.dev.entity.post.Subject;
 import com.devin.dev.entity.user.User;
+import com.devin.dev.model.DefaultResponse;
 import com.devin.dev.repository.post.PostImageRepository;
 import com.devin.dev.repository.post.PostRepository;
 import com.devin.dev.repository.post.PostTagRepository;
@@ -13,12 +14,15 @@ import com.devin.dev.repository.reply.ReplyImageRepository;
 import com.devin.dev.repository.reply.ReplyLikeRepository;
 import com.devin.dev.repository.subject.SubjectRepository;
 import com.devin.dev.repository.user.UserRepository;
+import com.devin.dev.utils.ResponseMessage;
+import com.devin.dev.utils.StatusCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,9 +39,13 @@ public class PostService {
     private final ReplyLikeRepository replyLikeRepository;
 
     @Transactional
-    public Long post(Long userId, String title, String content, List<String> tags, List<String> imagePaths) {
-        // 엔티티 조회
-        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유저 조회 실패"));
+    public DefaultResponse<?> post(Long userId, String title, String content, List<String> tags, List<String> imagePaths) {
+        // 엔티티 조회. 실패시 에러코드 반환
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_FOUND_USER);
+        }
+        User user = userOptional.get();
         List<Subject> postSubjects = subjectRepository.findByNameIn(tags);
 
         // 엔티티 생성
@@ -53,23 +61,24 @@ public class PostService {
         postImageRepository.saveAll(postImages);
         postTagRepository.saveAll(postTags);
 
-        return post.getId();
+        // 성공 메시지 및 코드 반환
+        return new DefaultResponse<>(StatusCode.OK, ResponseMessage.POST_UPLOAD_SUCCESS);
     }
 
     // 게시글 수정
     @Transactional
-    public Long editPost(Long userId, Long postId, String title, String content, List<String> tags, List<String> imagePaths) {
-        // 엔티티 조회. 실패시 IllegalArgumentException
-        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유저 조회 실패"));
-        Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("게시글 조회 실패"));
+    public DefaultResponse<?> editPost(Long userId, Long postId, String title, String content, List<String> tags, List<String> imagePaths) {
+        // 엔티티 조회. 실패시 에러코드 반환
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_FOUND_USER);
+        }
+        Optional<Post> postOptional = postRepository.findById(postId);
+        if (postOptional.isEmpty()) {
+            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_FOUND_POST);
+        }
+        Post post = postOptional.get();
         List<Subject> postSubjects = subjectRepository.findByNameIn(tags);
-        List<PostTag> existTags = postTagRepository.findByTagIn(postSubjects);
-
-        System.out.println("postSubjects = " + postSubjects);
-        System.out.println("existTags = " + existTags);
-        boolean b = postSubjects.containsAll(existTags.stream().map(PostTag::getTag).collect(Collectors.toList()));
-        System.out.println("booleanValue = " + b);
-
 
         // 기존 태그 및 이미지 경로 삭제
         List<PostImage> postImages = postImageRepository.findByPost(post);
@@ -81,8 +90,8 @@ public class PostService {
         post.setContent(content);
         List<PostTag> deleteList = new ArrayList<>();
 
-        for (PostTag tag : post.getTags()) { // 1 2
-            if (!postSubjects.contains(tag.getTag())) { // 2 3
+        for (PostTag tag : post.getTags()) {
+            if (!postSubjects.contains(tag.getTag())) {
                 deleteList.add(tag);
             } else {
                 postSubjects.remove(tag.getTag());
@@ -91,8 +100,6 @@ public class PostService {
         List<PostTag> newPostTags = PostTag.createPostTags(postSubjects);
         postTagRepository.deleteInBatch(deleteList);
 
-        System.out.println("deleteList = " + deleteList);
-        System.out.println("newPostTags = " + newPostTags);
         post.setPostTags(newPostTags);
         post.setPostImages(newPostImages);
 
@@ -101,6 +108,7 @@ public class PostService {
         postRepository.save(post);
         postTagRepository.saveAll(newPostTags);
 
-        return post.getId();
+        // 성공 메시지 및 코드 반환
+        return new DefaultResponse<>(StatusCode.OK, ResponseMessage.POST_EDIT_SUCCESS);
     }
 }

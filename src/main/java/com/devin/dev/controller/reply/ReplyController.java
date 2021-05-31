@@ -1,6 +1,7 @@
 package com.devin.dev.controller.reply;
 
 import com.devin.dev.dto.reply.ReplyDto;
+import com.devin.dev.model.DefaultResponse;
 import com.devin.dev.service.ReplyService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,10 +21,8 @@ public class ReplyController {
     private final ReplyService replyService;
 
     @PostMapping("/replies")
-    public CreateReplyResponse saveReply(@RequestBody @Valid CreateReplyRequest request) {
-        Long replyId = replyService.reply(request.getUserId(), request.getPostId(), request.getContent(), request.getReplyImages());
-
-        return new CreateReplyResponse(replyId);
+    public DefaultResponse<?> saveReply(@RequestBody @Valid CreateReplyRequest request) {
+        return replyService.reply(request.getUserId(), request.getPostId(), request.getContent(), request.getReplyImages());
     }
 
     @GetMapping("/reply/{id}")
