@@ -43,7 +43,6 @@ public class ReplyRepositoryQueryImpl implements ReplyRepositoryQuery {
      * left join replyImage set reply.image_id = replyImage.id
      * where reply.post_id = postId
      *
-     * @return
      */
     @Override
     public Page<Reply> findReplyPageByPost(Long postId, Pageable pageable) {
