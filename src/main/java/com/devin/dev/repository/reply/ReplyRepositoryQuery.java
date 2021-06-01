@@ -26,6 +26,6 @@ public interface ReplyRepositoryQuery {
 
     Optional<ReplyLike> findReplyLikeByLikeId(Long replyLikeId);
 
-    ReplyLike findLikeByUser(Reply inputReply, User inputUser);
+    Optional<ReplyLike> findLikeByUser(Reply inputReply, User inputUser);
 
 }
