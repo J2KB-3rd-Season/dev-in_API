@@ -1,6 +1,7 @@
 package com.devin.dev.service;
 
 import com.devin.dev.dto.reply.ReplyDto;
+import com.devin.dev.dto.reply.ReplyLikeDto;
 import com.devin.dev.dto.reply.ReplyMapper;
 import com.devin.dev.entity.post.Post;
 import com.devin.dev.entity.reply.Reply;
@@ -73,12 +74,22 @@ public class ReplyService {
     // 답변 수정
     @Transactional
     public DefaultResponse<ReplyDto> editReply(Long userId, Long replyId, String content, List<String> imagePaths) {
-        // 엔티티 조회. 실패시 IllegalArgumentException
+        // 엔티티 조회. 실패시 response 인스턴스 반환
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty()) {
             return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_FOUND_USER);
         }
-        Reply reply = replyRepository.findById(replyId).orElseThrow(() -> new IllegalArgumentException("답변 조회 실패"));
+        User user = userOptional.get();
+
+        Optional<Reply> replyOptional = replyRepository.findById(replyId);
+        if (replyOptional.isEmpty()) {
+            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_FOUND_REPLY);
+        }
+        Reply reply = replyOptional.get();
+
+        if (isNotSameUser(user, reply.getUser())) {
+            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_SAME_USER);
+        }
 
         // 기존 이미지 경로 삭제
         List<ReplyImage> replyImages = replyImageRepository.findByReply(reply);
@@ -102,16 +113,18 @@ public class ReplyService {
 
     // 좋아요 상태변경
     @Transactional
-    public Long changeReplyLike(Long userId, Long replyId) throws IllegalArgumentException {
+    public DefaultResponse<ReplyLikeDto> changeReplyLike(Long userId, Long replyId) throws IllegalArgumentException {
         // 엔티티 조회
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유저 조회 실패"));
         Reply reply = replyRepository.findById(replyId).orElseThrow(() -> new IllegalArgumentException("답변 조회 실패"));
 
         // 추천 조회
-        ReplyLike replyLike = replyRepository.findLikeByUser(reply, user);
+        Optional<ReplyLike> likeOptional = replyRepository.findLikeByUser(reply, user);
 
+        ReplyLike replyLike;
         // 추천 유무에 따라 실행
-        if (replyLike != null) {
+        if (likeOptional.isPresent()) {
+            replyLike = likeOptional.get();
             replyLikeRepository.delete(replyLike);
             if (isNotSameUser(user, reply.getUser())) {
                 // 좋아요 누른 사람 경험치 감소
@@ -130,7 +143,9 @@ public class ReplyService {
             replyLikeRepository.save(replyLike);
         }
 
-        return replyLike.getId();
+        ReplyLikeDto replyLikeDto = new ReplyLikeDto(replyLike.getId(), user.getName());
+
+        return new DefaultResponse<>(StatusCode.OK, ResponseMessage.REPLY_LIKE_CHANGE_SUCCESS, replyLikeDto);
     }
 
     @Transactional(readOnly = true)
