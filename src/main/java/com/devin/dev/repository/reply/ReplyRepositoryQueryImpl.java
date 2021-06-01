@@ -146,14 +146,14 @@ public class ReplyRepositoryQueryImpl implements ReplyRepositoryQuery {
     }
 
     @Override
-    public ReplyLike findLikeByUser(Reply inputReply, User inputUser) {
-        return queryFactory
+    public Optional<ReplyLike> findLikeByUser(Reply inputReply, User inputUser) {
+        return Optional.ofNullable(queryFactory
                 .selectFrom(replyLike)
                 .where(
                         replyLike.reply.eq(inputReply),
                         replyLike.user.eq(inputUser)
                 )
-                .fetchOne();
+                .fetchOne());
     }
 
 
