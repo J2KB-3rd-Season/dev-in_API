@@ -18,9 +18,10 @@ public class UserDetailsDto {
     private String profile;
     private UserStatus status;
     private String sns_type;
+    private String description;
 
     @QueryProjection
-    public UserDetailsDto(String name, String email, String password, String phone_number, Long exp, String profile, UserStatus status, String sns_type) {
+    public UserDetailsDto(String name, String email, String password, String phone_number, Long exp, String profile, UserStatus status, String sns_type, String description) {
         this.name = name;
         this.email = email;
         this.password = password;
@@ -29,5 +30,6 @@ public class UserDetailsDto {
         this.profile = profile;
         this.status = status;
         this.sns_type = sns_type;
+        this.description = description;
     }
 }
