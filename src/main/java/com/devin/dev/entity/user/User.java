@@ -51,19 +51,22 @@ public class User extends Created {
     private String name;
     @Setter
     private String email;
-
+    @Setter
     private String password;
-    private Long exp;
-
     @Setter
     private String phone_number;
     @Setter
     private String profile;
+    @Setter
+    private String sns_type;
+    @Setter
+    private String description;
 
+    private Long exp;
+
+    @Setter
     @Enumerated(EnumType.STRING)
     private UserStatus status;
-
-    private String sns_type;
 
     public User(String name, String email, String password, String phone_number, UserStatus status) {
         this.name = name;
