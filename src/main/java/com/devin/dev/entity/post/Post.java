@@ -63,7 +63,7 @@ public class Post extends ModifiedCreated {
         post.setUser(user);
         post.setTitle(title);
         post.setContent(content);
-        post.setStatus(PostStatus.NOT_CHOSEN);
+        post.setStatus(PostStatus.NOT_SELECTED);
 
         setPostTags(post, tags);
         setPostImages(post, images);
