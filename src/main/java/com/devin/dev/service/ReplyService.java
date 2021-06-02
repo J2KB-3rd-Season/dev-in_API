@@ -7,6 +7,7 @@ import com.devin.dev.entity.post.Post;
 import com.devin.dev.entity.reply.Reply;
 import com.devin.dev.entity.reply.ReplyImage;
 import com.devin.dev.entity.reply.ReplyLike;
+import com.devin.dev.entity.reply.ReplyStatus;
 import com.devin.dev.entity.user.User;
 import com.devin.dev.model.DefaultResponse;
 import com.devin.dev.repository.post.PostRepository;
@@ -45,6 +46,7 @@ public class ReplyService {
             return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_FOUND_USER);
         }
         User user = userOptional.get();
+        
         Optional<Post> postOptional = postRepository.findById(postId);
         if (postOptional.isEmpty()) {
             return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_FOUND_POST);
@@ -114,9 +116,18 @@ public class ReplyService {
     // 좋아요 상태변경
     @Transactional
     public DefaultResponse<ReplyLikeDto> changeReplyLike(Long userId, Long replyId) throws IllegalArgumentException {
-        // 엔티티 조회
-        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유저 조회 실패"));
-        Reply reply = replyRepository.findById(replyId).orElseThrow(() -> new IllegalArgumentException("답변 조회 실패"));
+        // 엔티티 조회. 실패시 response 인스턴스 반환
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_FOUND_USER);
+        }
+        User user = userOptional.get();
+
+        Optional<Reply> replyOptional = replyRepository.findById(replyId);
+        if (replyOptional.isEmpty()) {
+            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_FOUND_REPLY);
+        }
+        Reply reply = replyOptional.get();
 
         // 추천 조회
         Optional<ReplyLike> likeOptional = replyRepository.findLikeByUser(reply, user);
@@ -148,6 +159,41 @@ public class ReplyService {
         return new DefaultResponse<>(StatusCode.OK, ResponseMessage.REPLY_LIKE_CHANGE_SUCCESS, replyLikeDto);
     }
 
+    @Transactional
+    public DefaultResponse<?> deleteReply(Long userId, Long replyId) {
+        // 엔티티 조회. 실패시 response 인스턴스 반환
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_FOUND_USER);
+        }
+        User user = userOptional.get();
+
+        Optional<Reply> replyOptional = replyRepository.findById(replyId);
+        if (replyOptional.isEmpty()) {
+            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_FOUND_REPLY);
+        }
+        Reply reply = replyOptional.get();
+
+        // 작성자 확인
+        if (isNotSameUser(user, reply.getUser())) {
+            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_SAME_USER);
+        }
+
+        // 채택된 답변인지 확인
+        if (reply.getStatus() == ReplyStatus.SELECTED) {
+            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.CANNOT_DELETE_SELECTED);
+        }
+
+        // 리플 작성자 경험치 삭제
+        user.changeExp(User.ExpChangeType.DELETE_REPLY);
+
+        // 댓글 상태변경 DELETED 후 저장
+        reply.setStatus(ReplyStatus.DELETED);
+        replyRepository.save(reply);
+
+        return new DefaultResponse<>(StatusCode.OK, ResponseMessage.REPLY_DELETE_SUCCESS);
+    }
+
     @Transactional(readOnly = true)
     public Page<ReplyDto> findRepliesInPost(Long postId, Pageable pageable) {
         Page<Reply> replies = replyRepository.findReplyPageByPost(postId, pageable);
@@ -155,8 +201,7 @@ public class ReplyService {
 
         return new PageImpl<>(replyDtos, pageable, replies.getTotalElements());
     }
-
-
+    
     private boolean isNotSameUser(User firstUser, User secondUser) {
         return !firstUser.getId().equals(secondUser.getId());
     }
