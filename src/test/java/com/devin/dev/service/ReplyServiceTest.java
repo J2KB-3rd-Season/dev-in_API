@@ -6,6 +6,7 @@ import com.devin.dev.entity.post.Post;
 import com.devin.dev.entity.reply.Reply;
 import com.devin.dev.entity.reply.ReplyImage;
 import com.devin.dev.entity.reply.ReplyLike;
+import com.devin.dev.entity.reply.ReplyStatus;
 import com.devin.dev.entity.user.User;
 import com.devin.dev.entity.user.UserStatus;
 import com.devin.dev.model.DefaultResponse;
@@ -251,5 +252,36 @@ class ReplyServiceTest {
         assertThat(foundReply.getContent()).isEqualTo("reply_content");
     }
 
+    @Test
+    void deleteReplySuccess() {
+        User postUser = new User("D", "d@b.com", "passD", "0004", UserStatus.ACTIVE);
+        User replyUser = new User("E", "e@b.com", "passE", "0005", UserStatus.ACTIVE);
+        Post post1 = new Post(postUser, "PostC1", "ContentC1");
+        em.persist(postUser);
+        em.persist(post1);
+        em.persist(replyUser);
+
+        Reply reply = Reply.createReply(post1, replyUser, "reply_content");
+
+        ReplyImage replyImage1 = new ReplyImage("i1");
+        ReplyImage replyImage2 = new ReplyImage("i2");
+        ReplyImage replyImage3 = new ReplyImage("i3");
+
+        reply.setReplyImages(List.of(replyImage1, replyImage2, replyImage3));
+        em.persist(replyImage1);
+        em.persist(replyImage2);
+        em.persist(replyImage3);
+        em.persist(reply);
+        em.flush();
+
+        assertThat(reply.getStatus()).isEqualTo(ReplyStatus.NOT_SELECTED);
+        DefaultResponse<?> response = replyService.deleteReply(replyUser.getId(), reply.getId());
+        assertThat(response.getStatusCode()).isEqualTo(StatusCode.OK);
+        assertThat(response.getResponseMessage()).isEqualTo(ResponseMessage.REPLY_DELETE_SUCCESS);
+
+        Reply foundReply = replyRepository.findById(reply.getId()).get();
+        assertThat(foundReply.getStatus()).isEqualTo(ReplyStatus.DELETED);
+        assertThat(replyUser.getExp()).isEqualTo(-3L);
+    }
 
 }
