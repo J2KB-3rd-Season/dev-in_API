@@ -40,7 +40,7 @@ class HelloRepositoryQueryTest {
     public void findAll() {
         List<Hello> allHello = helloRepository.findAllCustom();
         assertThat(allHello)
-                .extracting("data")
+                .extracting("username")
                 .containsExactly("a", "b", "c", "d");
     }
 
