@@ -1,6 +1,7 @@
 package com.devin.dev.sample;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -17,15 +18,24 @@ public class Hello {
     @GeneratedValue
     Long id;
 
-    private String data;
+    private String password;
+    private String username;
+    private String role;
     private int price;
 
-    public Hello(String data) {
-        this.data = data;
+    public Hello(String username) {
+        this.username = username;
     }
 
-    public Hello(String data, int price) {
-        this.data = data;
+    public Hello(String username, int price) {
+        this.username = username;
         this.price = price;
+    }
+
+    @Builder
+    public Hello(String password, String username, String role) {
+        this.password = password;
+        this.username = username;
+        this.role = role;
     }
 }
