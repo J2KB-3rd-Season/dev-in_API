@@ -9,4 +9,11 @@ import lombok.NoArgsConstructor;
 public class HelloDto {
     private Long id;
     private String data;
+    private String password;
+
+    public HelloDto(Hello hello) {
+        this.id = hello.getId();
+        this.data = hello.getUsername();
+        this.password = hello.getPassword();
+    }
 }
