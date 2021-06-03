@@ -1,5 +1,6 @@
 package com.devin.dev.repository.user;
 
+import com.devin.dev.dto.user.UserDetailsDto;
 import com.devin.dev.dto.user.UserSimpleDto;
 import com.devin.dev.entity.user.User;
 
@@ -12,4 +13,5 @@ public interface UserRepositoryQuery {
 
     Optional<UserSimpleDto> findUserDtoById(Long userId);
 
+    Optional<UserDetailsDto> findUserDetailsByEmail(String email);
 }
