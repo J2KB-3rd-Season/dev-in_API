@@ -15,39 +15,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import javax.persistence.EntityManager;
 
 @Configuration
-@EnableWebSecurity
-public class AppConfiguration extends WebSecurityConfigurerAdapter {
+public class AppConfiguration {
 
     @Bean
     public JPAQueryFactory jpaQueryFactory(EntityManager em) {
         return new JPAQueryFactory(em);
     }
 
-    @Bean
-    public PasswordEncoder getPasswordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-//                .cors().disable()      // cors 비활성화
-                .csrf().disable()      // csrf 비활성화
-                .authorizeRequests()
-                    .antMatchers("/login", "/signUp")
-                        .permitAll()
-                    .anyRequest()
-                    .authenticated()
-                .and()
-                .formLogin()
-                    .loginPage("/login")
-                    .loginProcessingUrl("/signIn")
-                    .usernameParameter("id")
-                    .passwordParameter("pw")
-                    .successHandler(new LoginSuccessHandler())
-                .and()
-                .logout()
-                    .logoutUrl("/logout")
-                    .logoutSuccessUrl("/login");
-    }
 }
