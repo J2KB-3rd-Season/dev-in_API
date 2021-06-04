@@ -1,7 +1,7 @@
 package com.devin.dev.repository;
 
 import com.devin.dev.controller.post.PostSearchCondition;
-import com.devin.dev.dto.post.PostDto;
+import com.devin.dev.dto.post.PostSimpleDto;
 import com.devin.dev.entity.post.Post;
 import com.devin.dev.entity.post.PostTag;
 import com.devin.dev.entity.post.Subject;
@@ -145,14 +145,14 @@ class PostRepositoryTest {
     void findPostDtoByUser() {
         User userA = userRepository.findByName("A").get();
 
-        List<PostDto> postDtosA = postRepository.findPostDtoByUser(userA);
-        assertThat(postDtosA).extracting("title").containsExactly("PostA1", "PostA2", "PostA3");
-        assertThat(postDtosA).extracting("content").containsExactly("ContentA1", "ContentA2", "ContentA3");
+        List<PostSimpleDto> postSimpleDtosA = postRepository.findPostDtoByUser(userA);
+        assertThat(postSimpleDtosA).extracting("title").containsExactly("PostA1", "PostA2", "PostA3");
+        assertThat(postSimpleDtosA).extracting("content").containsExactly("ContentA1", "ContentA2", "ContentA3");
 
         User userD = userRepository.findByName("D").get();
-        List<PostDto> postDtosD = postRepository.findPostDtoByUser(userD);
+        List<PostSimpleDto> postSimpleDtosD = postRepository.findPostDtoByUser(userD);
 
-        assertThat(postDtosD.size()).isEqualTo(0);
+        assertThat(postSimpleDtosD.size()).isEqualTo(0);
     }
 
     @Test
@@ -162,7 +162,7 @@ class PostRepositoryTest {
         condition.setUsername("A");
         condition.setTitle("Post");
         Pageable pageable = PageRequest.of(0, 4);
-        Page<PostDto> postDtoPage = postRepository.findPostDtoPageWithCondition(condition, pageable);
+        Page<PostSimpleDto> postDtoPage = postRepository.findPostDtoPageWithCondition(condition, pageable);
         assertThat(postDtoPage).extracting("title").containsExactly("PostA1", "PostA2");
     }
 }
