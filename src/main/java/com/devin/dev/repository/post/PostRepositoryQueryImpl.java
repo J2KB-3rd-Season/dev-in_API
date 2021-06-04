@@ -2,7 +2,7 @@ package com.devin.dev.repository.post;
 
 import com.devin.dev.controller.post.PostSearchCondition;
 import com.devin.dev.dto.post.PostSimpleDto;
-import com.devin.dev.dto.post.QPostDto;
+import com.devin.dev.dto.post.QPostSimpleDto;
 import com.devin.dev.entity.post.*;
 import com.devin.dev.entity.user.User;
 import com.querydsl.core.QueryResults;
@@ -57,11 +57,12 @@ public class PostRepositoryQueryImpl implements PostRepositoryQuery {
     @Override
     public Page<PostSimpleDto> findPostDtoPageWithCondition(PostSearchCondition condition, Pageable pageable) {
         QueryResults<PostSimpleDto> results = queryFactory
-                .selectDistinct(new QPostDto(
+                .selectDistinct(new QPostSimpleDto(
                         post.title,
                         user.name,
                         post.content,
-                        post.status
+                        post.status,
+                        post.replies.size()
                 ))
                 .from(post)
                 .innerJoin(post.user, user)
@@ -85,7 +86,13 @@ public class PostRepositoryQueryImpl implements PostRepositoryQuery {
     @Override
     public List<PostSimpleDto> findPostDtoByUser(User user) {
         return queryFactory
-                .select(new QPostDto(post.title, post.user.name, post.content, post.status)) // QDTO 생성자 사용. @Projections 및 Q파일 컨파일
+                .select(new QPostSimpleDto(
+                        post.title,
+                        post.user.name,
+                        post.content,
+                        post.status,
+                        post.replies.size()
+                )) // QDTO 생성자 사용. @Projections 및 Q파일 컨파일
                 .from(post)
                 .where(post.user.eq(user))
                 .fetch();
