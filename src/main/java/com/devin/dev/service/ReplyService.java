@@ -195,11 +195,12 @@ public class ReplyService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ReplyDto> findRepliesInPost(Long postId, Pageable pageable) {
+    public DefaultResponse<Page<ReplyDto>> findRepliesInPost(Long postId, Pageable pageable) {
         Page<Reply> replies = replyRepository.findReplyPageByPost(postId, pageable);
         List<ReplyDto> replyDtos = ReplyMapper.toDtos(replies.toList());
 
-        return new PageImpl<>(replyDtos, pageable, replies.getTotalElements());
+        PageImpl<ReplyDto> page = new PageImpl<>(replyDtos, pageable, replies.getTotalElements());
+        return new DefaultResponse<>(StatusCode.OK, ResponseMessage.FOUND_POST, page);
     }
     
     private boolean isNotSameUser(User firstUser, User secondUser) {

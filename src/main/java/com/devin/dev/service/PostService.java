@@ -21,6 +21,7 @@ import com.devin.dev.utils.ResponseMessage;
 import com.devin.dev.utils.StatusCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -123,6 +124,8 @@ public class PostService {
     public DefaultResponse<Page<PostSimpleDto>> searchPosts(PostSearchCondition condition, Pageable pageable) {
         Page<PostSimpleDto> postDtos = postRepository.findPostDtoPageWithCondition(condition, pageable);
 
-        return new DefaultResponse<>(StatusCode.OK, ResponseMessage.FOUND_POST, postDtos);
+        PageImpl<PostSimpleDto> page = new PageImpl<>(postDtos.toList(), pageable, postDtos.getTotalElements());
+
+        return new DefaultResponse<>(StatusCode.OK, ResponseMessage.FOUND_POST, page);
     }
 }
