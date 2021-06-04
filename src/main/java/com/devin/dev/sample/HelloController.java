@@ -1,5 +1,6 @@
 package com.devin.dev.sample;
 
+import com.devin.dev.SampleData;
 import com.devin.dev.entity.user.User;
 import com.devin.dev.model.DefaultResponse;
 import com.devin.dev.utils.StatusCode;
@@ -21,6 +22,7 @@ import javax.validation.Valid;
 public class HelloController {
 
     private final HelloService helloService;
+    private final SampleData sampleData;
 
     @GetMapping("/hello")
     public String hello() {
@@ -73,4 +75,13 @@ public class HelloController {
         return "main";
     }
 
+    @GetMapping("/setting")
+    public String createSampleData() {
+        sampleData.createSubjects();
+        sampleData.createUsers();
+        sampleData.createPosts();
+        sampleData.createReplies();
+
+        return "redirect:/";
+    }
 }
