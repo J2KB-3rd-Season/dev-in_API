@@ -24,7 +24,7 @@ public class UserService {
     private final UserRepository userRepository;
 
     @Transactional
-    public DefaultResponse<UserSimpleDto> signUp(UserSimpleDto userDto) {
+    public DefaultResponse<UserDetailsDto> signUp(UserSimpleDto userDto) {
         // 엔티티 조회
         Optional<User> foundUser = userRepository.findByEmailEquals(userDto.getEmail());
         if (foundUser.isPresent()) {
@@ -40,7 +40,9 @@ public class UserService {
         User user = new User(userDto);
         userRepository.save(user);
 
-        return new DefaultResponse<>(StatusCode.OK, ResponseMessage.CREATED_USER, userDto);
+        UserDetailsDto userDetailsDto = new UserDetailsDto(user);
+
+        return new DefaultResponse<>(StatusCode.OK, ResponseMessage.CREATED_USER, userDetailsDto);
     }
 
     @Transactional(readOnly = true)
