@@ -1,5 +1,7 @@
 package com.devin.dev.service;
 
+import com.devin.dev.controller.post.PostSearchCondition;
+import com.devin.dev.dto.post.PostSimpleDto;
 import com.devin.dev.entity.post.Post;
 import com.devin.dev.entity.post.PostImage;
 import com.devin.dev.entity.post.PostTag;
@@ -17,13 +19,14 @@ import com.devin.dev.repository.user.UserRepository;
 import com.devin.dev.utils.ResponseMessage;
 import com.devin.dev.utils.StatusCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -110,5 +113,13 @@ public class PostService {
 
         // 성공 메시지 및 코드 반환
         return new DefaultResponse<>(StatusCode.OK, ResponseMessage.POST_EDIT_SUCCESS);
+    }
+
+    // 게시글 검색
+    @Transactional
+    public DefaultResponse<Page<PostSimpleDto>> searchPosts(PostSearchCondition condition, Pageable pageable) {
+        Page<PostSimpleDto> postDtos = postRepository.findPostDtoPageWithCondition(condition, pageable);
+
+        return new DefaultResponse<>(StatusCode.OK, ResponseMessage.FOUND_POST, postDtos);
     }
 }
