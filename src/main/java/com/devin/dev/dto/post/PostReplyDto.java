@@ -1,4 +1,4 @@
-package com.devin.dev.dto;
+package com.devin.dev.dto.post;
 
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Data;
