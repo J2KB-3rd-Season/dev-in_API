@@ -1,6 +1,7 @@
 package com.devin.dev.service;
 
 import com.devin.dev.controller.post.PostSearchCondition;
+import com.devin.dev.dto.post.PostDetailsDto;
 import com.devin.dev.dto.post.PostSimpleDto;
 import com.devin.dev.entity.post.Post;
 import com.devin.dev.entity.post.PostImage;
@@ -42,7 +43,7 @@ public class PostService {
     private final ReplyLikeRepository replyLikeRepository;
 
     @Transactional
-    public DefaultResponse<?> post(Long userId, String title, String content, List<String> tags, List<String> imagePaths) {
+    public DefaultResponse<PostDetailsDto> post(Long userId, String title, String content, List<String> tags, List<String> imagePaths) {
         // 엔티티 조회. 실패시 에러코드 반환
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty()) {
@@ -64,8 +65,10 @@ public class PostService {
         postImageRepository.saveAll(postImages);
         postTagRepository.saveAll(postTags);
 
+        PostDetailsDto postDto = new PostDetailsDto(post);
+
         // 성공 메시지 및 코드 반환
-        return new DefaultResponse<>(StatusCode.OK, ResponseMessage.POST_UPLOAD_SUCCESS);
+        return new DefaultResponse<>(StatusCode.OK, ResponseMessage.POST_UPLOAD_SUCCESS, postDto);
     }
 
     // 게시글 수정
