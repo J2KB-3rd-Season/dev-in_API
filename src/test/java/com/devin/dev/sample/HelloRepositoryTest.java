@@ -40,7 +40,7 @@ class HelloRepositoryTest {
     public void findAll() {
         List<Hello> allHello = helloJpaRepository.findAll();
         assertThat(allHello)
-                .extracting("data")
+                .extracting("username")
                 .containsExactly("a", "b", "c", "d");
     }
 
