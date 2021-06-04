@@ -1,11 +1,9 @@
 package com.devin.dev.repository.post;
 
 import com.devin.dev.controller.post.PostSearchCondition;
-import com.devin.dev.dto.post.PostDto;
+import com.devin.dev.dto.post.PostSimpleDto;
 import com.devin.dev.dto.post.QPostDto;
 import com.devin.dev.entity.post.*;
-import com.devin.dev.entity.reply.Reply;
-import com.devin.dev.entity.user.QUser;
 import com.devin.dev.entity.user.User;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -17,13 +15,11 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.Query;
 import java.util.List;
 
 import static com.devin.dev.entity.post.QPost.post;
 import static com.devin.dev.entity.post.QPostTag.postTag;
 import static com.devin.dev.entity.post.QSubject.subject;
-import static com.devin.dev.entity.reply.QReply.reply;
 import static com.devin.dev.entity.user.QUser.user;
 import static org.springframework.util.StringUtils.hasText;
 
@@ -59,8 +55,8 @@ public class PostRepositoryQueryImpl implements PostRepositoryQuery {
 
      */
     @Override
-    public Page<PostDto> findPostDtoPageWithCondition(PostSearchCondition condition, Pageable pageable) {
-        QueryResults<PostDto> results = queryFactory
+    public Page<PostSimpleDto> findPostDtoPageWithCondition(PostSearchCondition condition, Pageable pageable) {
+        QueryResults<PostSimpleDto> results = queryFactory
                 .selectDistinct(new QPostDto(
                         post.title,
                         user.name,
@@ -79,7 +75,7 @@ public class PostRepositoryQueryImpl implements PostRepositoryQuery {
                 .limit(pageable.getPageSize())
                 .fetchResults();
 
-        List<PostDto> content = results.getResults();
+        List<PostSimpleDto> content = results.getResults();
 
         long total = results.getTotal();
 
@@ -87,7 +83,7 @@ public class PostRepositoryQueryImpl implements PostRepositoryQuery {
     }
 
     @Override
-    public List<PostDto> findPostDtoByUser(User user) {
+    public List<PostSimpleDto> findPostDtoByUser(User user) {
         return queryFactory
                 .select(new QPostDto(post.title, post.user.name, post.content, post.status)) // QDTO 생성자 사용. @Projections 및 Q파일 컨파일
                 .from(post)
