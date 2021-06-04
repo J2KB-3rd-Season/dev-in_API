@@ -82,8 +82,7 @@ class UserRepositoryTest {
 
         List<User> allUsers = userRepository.findAll();
 
-        assertThat(allUsers.size()).isEqualTo(4);
-        assertThat(allUsers).extracting("name").containsExactly("A", "B", "C", "D");
+        assertThat(allUsers).extracting("name").contains("A", "B", "C", "D");
     }
 
     @Test
