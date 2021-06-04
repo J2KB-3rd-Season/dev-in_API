@@ -28,7 +28,8 @@ public class ReplyController {
     @GetMapping("/reply/{id}")
     public Page<ReplyDto> findReplies(
             @PathVariable("id") Long postId, Pageable pageable) {
-        return replyService.findRepliesInPost(postId, pageable);
+        DefaultResponse<Page<ReplyDto>> response = replyService.findRepliesInPost(postId, pageable);
+        return response.getData();
     }
 
     @Data
