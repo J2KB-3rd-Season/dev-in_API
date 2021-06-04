@@ -20,10 +20,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SampleData {
 
-    UserService userService;
-    PostService postService;
-    ReplyService replyService;
-    SubjectService subjectService;
+    private final UserService userService;
+    private final PostService postService;
+    private final ReplyService replyService;
+    private final SubjectService subjectService;
 
     List<UserDetailsDto> userDtos = new ArrayList<>();
     List<PostDetailsDto> postDtos = new ArrayList<>();
