@@ -1,5 +1,6 @@
-package com.devin.dev.sample;
+package com.devin.dev.security;
 
+import com.devin.dev.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -14,12 +15,12 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class BackedLoginService implements UserDetailsService {
 
-    private final HelloRepository helloRepository;
+    private final UserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Hello hello = helloRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("유저 없음"));
+        com.devin.dev.entity.user.User user = userRepository.findByEmailEquals(username).orElseThrow();
 
-        return new User(hello.getUsername(), hello.getPassword(), Collections.singletonList(new SimpleGrantedAuthority(hello.getRole())));
+        return new User(user.getName(), user.getPassword(), Collections.singletonList(new SimpleGrantedAuthority(user.getStatus().toString())));
     }
 }
