@@ -35,7 +35,7 @@ public class HelloController {
         return "redirect:/";
     }
 
-    @PostMapping("/signUp")
+    @PostMapping("/test_signUp")
     public String signUp(@Valid HelloForm form, BindingResult result) {
         if (result.hasErrors()) {
             return "redirect:/";
@@ -46,29 +46,29 @@ public class HelloController {
         return "redirect:/";
     }
 
-    @GetMapping("/login")
+    @GetMapping("/test_login")
     public String getLoginForm() {
         return "loginPage";
     }
 
-    @GetMapping("/signUp")
+    @GetMapping("/test_signUp")
     public String getSignUpForm() {
         return "signupPage";
     }
 
-    @GetMapping("/")
-    public String getIndex(Model model) {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String username;
-        if (principal instanceof UserDetails) {
-            username = ((UserDetails) principal).getUsername();
-        } else {
-            username = principal.toString();
-        }
-        model.addAttribute("username", username);
-
-        return "index";
-    }
+//    @GetMapping("/")
+//    public String getIndex(Model model) {
+//        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        String username;
+//        if (principal instanceof UserDetails) {
+//            username = ((UserDetails) principal).getUsername();
+//        } else {
+//            username = principal.toString();
+//        }
+//        model.addAttribute("username", username);
+//
+//        return "index";
+//    }
 
     @GetMapping("/main")
     public String getMain() {
