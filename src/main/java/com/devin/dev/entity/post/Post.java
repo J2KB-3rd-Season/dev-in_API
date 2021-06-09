@@ -12,6 +12,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -100,5 +101,9 @@ public class Post extends ModifiedCreated {
 
     public void setPostImages(List<PostImage> postImages) {
         setPostImages(this, postImages);
+    }
+
+    public List<String> getPostTags() {
+        return this.tags.stream().map(tag -> tag.getTag().getName()).collect(Collectors.toList());
     }
 }

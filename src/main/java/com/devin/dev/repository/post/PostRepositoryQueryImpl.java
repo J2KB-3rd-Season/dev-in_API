@@ -98,6 +98,21 @@ public class PostRepositoryQueryImpl implements PostRepositoryQuery {
                 .fetch();
     }
 
+    @Override
+    public Page<Post> findAllByTagId(Long id, Pageable pageable) {
+        QueryResults<Post> results = queryFactory
+            .selectFrom(post)
+            .where(post.tags.any().id.eq(id))
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .fetchResults();
+
+        List<Post> content = results.getResults();
+        long total = results.getTotal();
+
+        return new PageImpl<>(content, pageable, total);
+    }
+
     private BooleanExpression usernameLike(String username) {
         return hasText(username) ? user.name.contains(username) : null;
     }

@@ -2,6 +2,7 @@ package com.devin.dev.service;
 
 import com.devin.dev.controller.post.PostSearchCondition;
 import com.devin.dev.dto.post.PostDetailsDto;
+import com.devin.dev.dto.post.PostInfoDto;
 import com.devin.dev.dto.post.PostSimpleDto;
 import com.devin.dev.entity.post.Post;
 import com.devin.dev.entity.post.PostImage;
@@ -20,6 +21,7 @@ import com.devin.dev.repository.user.UserRepository;
 import com.devin.dev.utils.ResponseMessage;
 import com.devin.dev.utils.StatusCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -127,5 +129,13 @@ public class PostService {
         PageImpl<PostSimpleDto> page = new PageImpl<>(postDtos.toList(), pageable, postDtos.getTotalElements());
 
         return new DefaultResponse<>(StatusCode.OK, ResponseMessage.FOUND_POST, page);
+    }
+
+    @Transactional
+    public DefaultResponse<Page<PostInfoDto>> getPostInfoList(Long id, Pageable pageable) {
+        Page<Post> posts =  (id > 0)? postRepository.findAllByTagId(id, pageable) : postRepository.findAll(pageable);
+        Page<PostInfoDto> postInfoDtos = posts.map(PostInfoDto::new);
+        PageImpl<PostInfoDto> postInfoDtosImpl = new PageImpl<>(postInfoDtos.toList(), pageable, postInfoDtos.getTotalElements());
+        return new DefaultResponse<>(StatusCode.OK, ResponseMessage.FOUND_POST, postInfoDtosImpl);
     }
 }
