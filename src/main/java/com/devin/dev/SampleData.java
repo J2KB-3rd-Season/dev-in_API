@@ -1,7 +1,6 @@
 package com.devin.dev;
 
 import com.devin.dev.dto.post.PostDetailsDto;
-import com.devin.dev.dto.post.PostSimpleDto;
 import com.devin.dev.dto.reply.ReplyDto;
 import com.devin.dev.dto.user.UserDetailsDto;
 import com.devin.dev.dto.user.UserSimpleDto;
@@ -11,6 +10,7 @@ import com.devin.dev.service.ReplyService;
 import com.devin.dev.service.SubjectService;
 import com.devin.dev.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -18,7 +18,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class SampleData {
+public class SampleData implements CommandLineRunner {
 
     private final UserService userService;
     private final PostService postService;
@@ -70,4 +70,14 @@ public class SampleData {
     }
 
 
+
+    @Override
+    public void run(String... args) throws Exception {
+        if (args.length > 0 && args[0].equals("test")) {
+            createSubjects();
+            createUsers();
+            createPosts();
+            createReplies();
+        }
+    }
 }
