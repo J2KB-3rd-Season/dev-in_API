@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
@@ -88,7 +87,7 @@ class UserServiceTest {
         em.flush();
 
         // 암호화 하기 전 패스워드로 변경
-        userDto.setPassword("passA");
+        userDto.setUserPassword("passA");
 
         // 조회
         DefaultResponse<?> response = userService.signIn(userDto);
@@ -109,8 +108,8 @@ class UserServiceTest {
         em.flush();
 
         // 틀린 이메일
-        userDto.setEmail("aa@b.com");
-        userDto.setPassword("passA");
+        userDto.setUserEmail("aa@b.com");
+        userDto.setUserPassword("passA");
 
         // 조회
         DefaultResponse<?> response = userService.signIn(userDto);
@@ -130,7 +129,7 @@ class UserServiceTest {
         em.flush();
 
         // 틀린 패스워드
-        userDto.setPassword("paddmvjdj");
+        userDto.setUserPassword("paddmvjdj");
 
         // 조회
         DefaultResponse<?> response = userService.signIn(userDto);
