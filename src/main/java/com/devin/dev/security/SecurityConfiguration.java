@@ -8,10 +8,15 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+    private static final String[] PUBLIC_URI = {
+            "/user/**", "/postlist/**"
+    };
+
     @Bean
     public PasswordEncoder getPasswordEncoder() {
         return new BCryptPasswordEncoder();
@@ -20,28 +25,19 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .cors().disable()      // cors 비활성화
-                .csrf().disable()      // csrf 비활성화
-                .authorizeRequests()
-                    .antMatchers("/login", "/signUp")
+            .cors().disable()      // cors 비활성화
+            .csrf().disable()      // csrf 비활성화
+            .authorizeRequests()
+                .antMatchers("/user/**", "/postlist/**")
                     .permitAll()
-                    .anyRequest()
-                    .authenticated()
-                .and()
-                .formLogin()
-                    .loginPage("/login")
-                    .loginProcessingUrl("/signIn")
-                    .usernameParameter("email")
-                    .passwordParameter("password")
-                    .successHandler(new LoginSuccessHandler())
-                .and()
-                .logout()
-                    .logoutUrl("/logout")
-                    .logoutSuccessUrl("/login");
+                .anyRequest()
+                    .authenticated();
+
+        http.addFilterBefore(tokenAuthFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/postlist/**");
+    @Bean
+    public TokenAuthFilter tokenAuthFilter() {
+        return new TokenAuthFilter();
     }
 }

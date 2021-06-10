@@ -1,10 +1,8 @@
 package com.devin.dev.entity.user;
 
-import com.devin.dev.dto.user.UserDetailsDto;
 import com.devin.dev.dto.user.UserSimpleDto;
 import com.devin.dev.entity.base.Created;
 import com.devin.dev.entity.post.Post;
-import com.devin.dev.entity.post.PostTag;
 import com.devin.dev.entity.reply.Reply;
 import com.devin.dev.entity.service.CustomerService;
 import lombok.AccessLevel;
@@ -78,10 +76,10 @@ public class User extends Created {
     }
 
     public User(UserSimpleDto userDto) {
-        this.name = userDto.getName();
-        this.email = userDto.getEmail();
-        this.password = userDto.getPassword();
-        this.phone_number = userDto.getPhone_number();
+        this.name = userDto.getUserName();
+        this.email = userDto.getUserEmail();
+        this.password = userDto.getUserPassword();
+        this.phone_number = userDto.getUserPhoneNumber();
         this.status = UserStatus.ACTIVE;
         this.exp = 0L;
     }
