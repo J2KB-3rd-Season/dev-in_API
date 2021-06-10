@@ -1,7 +1,9 @@
 package com.devin.dev.repository.post;
 
 import com.devin.dev.controller.post.PostSearchCondition;
+import com.devin.dev.dto.post.PostDetailsDto;
 import com.devin.dev.dto.post.PostSimpleDto;
+import com.devin.dev.dto.post.QPostDetailsDto;
 import com.devin.dev.dto.post.QPostSimpleDto;
 import com.devin.dev.entity.post.*;
 import com.devin.dev.entity.user.User;
@@ -16,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.devin.dev.entity.post.QPost.post;
 import static com.devin.dev.entity.post.QPostTag.postTag;
@@ -111,6 +114,24 @@ public class PostRepositoryQueryImpl implements PostRepositoryQuery {
         long total = results.getTotal();
 
         return new PageImpl<>(content, pageable, total);
+    }
+
+    @Override
+    public Optional<PostDetailsDto> findDetailById(Long id) {
+        Post post = queryFactory
+                .selectFrom(QPost.post)
+                .where(QPost.post.id.eq(id))
+                .fetchOne();
+
+        Optional<PostDetailsDto> postDetailsDtoOptional;
+        if(post != null) {
+            postDetailsDtoOptional = Optional.of(new PostDetailsDto(post));
+        }
+        else {
+            postDetailsDtoOptional = Optional.empty();
+        }
+
+        return postDetailsDtoOptional;
     }
 
     private BooleanExpression usernameLike(String username) {
