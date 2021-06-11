@@ -37,7 +37,7 @@ public class TokenAuthFilter extends OncePerRequestFilter {
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (UsernameNotFoundException e) {
-                throw new RuntimeException();
+                throw new RuntimeException("User name not found");
             }
         }
         filterChain.doFilter(request, response);

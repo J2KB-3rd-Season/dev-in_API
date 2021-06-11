@@ -6,6 +6,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -13,10 +14,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-    private static final String[] PUBLIC_URI = {
-            "/user/**", "/postlist/**"
-    };
-
     @Bean
     public PasswordEncoder getPasswordEncoder() {
         return new BCryptPasswordEncoder();
@@ -28,10 +25,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .cors().disable()      // cors 비활성화
             .csrf().disable()      // csrf 비활성화
             .authorizeRequests()
-                .antMatchers("/user/**", "/postlist/**")
+                .antMatchers("/user/**")
                     .permitAll()
                 .anyRequest()
-                    .authenticated();
+                    .authenticated().and()
+                    .httpBasic()
+                .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.addFilterBefore(tokenAuthFilter(), UsernamePasswordAuthenticationFilter.class);
     }

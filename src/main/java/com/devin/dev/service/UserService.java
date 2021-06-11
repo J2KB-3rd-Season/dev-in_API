@@ -125,4 +125,8 @@ public class UserService {
         UserLoginResponseDto responseDto = new UserLoginResponseDto(user, token);
         return new DefaultResponse<>(StatusCode.OK, ResponseMessage.LOGIN_SUCCESS, responseDto);
     }
+
+    public User findUserByEmail(String email) {
+        return userRepository.findByEmailEquals(email).orElseThrow();
+    }
 }
