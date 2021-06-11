@@ -44,9 +44,9 @@ public class PostInfoDto {
         this.title = post.getTitle();
         this.tags = post.getPostTags();
         this.statusAccept = post.getStatus() == PostStatus.SELECTED;
-        this.statusLike = post.getPostLikes().size() > 0;
+        this.statusLike = post.getLikes().size() > 0;
         this.replyNum = post.getReplies().size();
-        this.likeNum = post.getPostLikes().size();
+        this.likeNum = post.getLikes().size();
         this.createdDate = post.getCreatedDate();
         this.userId = post.getUser().getId();
         this.username = post.getUser().getName();

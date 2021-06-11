@@ -3,7 +3,6 @@ package com.devin.dev.controller.post;
 import com.devin.dev.controller.reply.ReplyOrderCondition;
 import com.devin.dev.dto.post.PostDetailsDto;
 import com.devin.dev.model.DefaultResponse;
-import com.devin.dev.security.JwtAuthTokenProvider;
 import com.devin.dev.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
@@ -28,14 +27,15 @@ public class PostController {
     @GetMapping("/postlist/{id}")
     public DefaultResponse<PostDetailsDto> getPostDetails(
             @PathVariable("id") Long postId,
-            @RequestParam(defaultValue = "true", name = "sort_reply") boolean sort_reply) {
+            @RequestParam(defaultValue = "true", name = "sort_reply") boolean sort_reply,
+            HttpServletRequest request) {
         ReplyOrderCondition replyOrderCondition = new ReplyOrderCondition();
         if (!sort_reply) {
             replyOrderCondition.setLatestDate(true);
         } else {
             replyOrderCondition.setLikeCount(true);
         }
-        return postService.getPost(postId, replyOrderCondition);
+        return postService.getPost(postId, replyOrderCondition, request);
     }
 
     @GetMapping("/postlist")
@@ -52,6 +52,17 @@ public class PostController {
 
     @PostMapping("/post")
     public DefaultResponse<?> post(@RequestBody PostForm form, HttpServletRequest request) {
-        return postService.post(request, form);
+        return postService.post(form, request);
     }
+
+    @PatchMapping("/post/{id}/like")
+    public DefaultResponse<?> changePostLike(@PathVariable("id") Long postId, HttpServletRequest request) {
+        return postService.changePostLike(postId, request);
+    }
+
+    @PutMapping("/post/{id}/update")
+    public DefaultResponse<?> reply(@PathVariable("id") Long replyId, @RequestBody PostUpdateForm form, HttpServletRequest request) {
+        return postService.editPost(replyId, form, request);
+    }
+
 }

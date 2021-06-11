@@ -2,10 +2,7 @@ package com.devin.dev.service;
 
 import com.devin.dev.controller.reply.ReplyOrderCondition;
 import com.devin.dev.dto.post.PostDetailsDto;
-import com.devin.dev.entity.post.Post;
-import com.devin.dev.entity.post.PostImage;
-import com.devin.dev.entity.post.PostTag;
-import com.devin.dev.entity.post.Subject;
+import com.devin.dev.entity.post.*;
 import com.devin.dev.entity.user.User;
 import com.devin.dev.entity.user.UserStatus;
 import com.devin.dev.model.DefaultResponse;
@@ -58,7 +55,7 @@ class PostServiceTest {
     @Test
     void postSucceeded() {
         DefaultResponse<?> response = postService.post(postUser.getId(), "titleA1", "postA1", List.of("s1", "s2"), List.of("p1", "p2", "p3"));
-        assertThat(response.getStatusCode()).isEqualTo(StatusCode.OK);
+        assertThat(response.getStatusCode()).isEqualTo(StatusCode.SUCCESS.getCode());
         assertThat(response.getResponseMessage()).isEqualTo(ResponseMessage.POST_UPLOAD_SUCCESS);
 
         List<Post> posts = postRepository.findByTitle("titleA1");
@@ -72,7 +69,7 @@ class PostServiceTest {
     @Test
     void postFailed() {
         DefaultResponse<?> response = postService.post(9999L, "titleA1", "postA1", List.of("s1", "s2"), List.of("p1", "p2", "p3"));
-        assertThat(response.getStatusCode()).isEqualTo(StatusCode.BAD_REQUEST);
+        assertThat(response.getStatusCode()).isEqualTo(StatusCode.NOT_EXIST.getCode());
         assertThat(response.getResponseMessage()).isEqualTo(ResponseMessage.NOT_FOUND_USER);
     }
 
@@ -120,15 +117,18 @@ class PostServiceTest {
         post1.setPostTags(postTags);
         List<PostImage> postImages = PostImage.createPostImages(List.of("p1", "p2", "p3"));
         post1.setPostImages(postImages);
+        post1.setStatus(PostStatus.NOT_SELECTED);
         postTags.forEach(em::persist);
         postImages.forEach(em::persist);
         em.persist(post1);
+        em.flush();
+        em.clear();
 
         ReplyOrderCondition replyOrderCondition = new ReplyOrderCondition();
         replyOrderCondition.setLatestDate(true);
 
         DefaultResponse<PostDetailsDto> response = postService.getPost(post1.getId(), replyOrderCondition);
-        assertThat(response.getStatusCode()).isEqualTo(StatusCode.OK);
+        assertThat(response.getStatusCode()).isEqualTo(StatusCode.SUCCESS.getCode());
         assertThat(response.getResponseMessage()).isEqualTo(ResponseMessage.FOUND_POST);
 
         PostDetailsDto postDto = response.getData();
@@ -153,4 +153,5 @@ class PostServiceTest {
         Post post = em.find(Post.class, post1.getId());
         assertThat(post).isNull();
     }
+
 }
