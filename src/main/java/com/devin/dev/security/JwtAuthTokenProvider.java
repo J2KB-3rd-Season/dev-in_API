@@ -1,9 +1,19 @@
 package com.devin.dev.security;
 
+import com.devin.dev.entity.user.User;
+import com.devin.dev.service.UserService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -14,9 +24,15 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 @Component
-public class JwtAuthTokenProvider {
+public class JwtAuthTokenProvider implements AuthenticationProvider{
     private static final String SECRET_KEY = "J2KBJ2KBJ2KBJ2KBJ2KBJ2KBJ2KBJ2KBJ2KBJ2KBJ2KBJ2KBJ2KBJ2KB";
     private static final long EXPIRATION_MS = 1000 * 60 * 60 * 24;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public JwtAuthToken publishToken(Long userId) {
         return JwtAuthToken.builder().token(generateToken(userId)).build();
@@ -55,12 +71,37 @@ public class JwtAuthTokenProvider {
             try {
                 Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token);
                 return true;
-            } catch (Exception e) {
-                throw new RuntimeException();
+            } catch (SignatureException e) {
+                System.out.println("Invalid JWT signature");
+            } catch (MalformedJwtException e) {
+                System.out.println("Invalid JWT token");
+            } catch (ExpiredJwtException e) {
+                System.out.println("Expired JWT token");
+            } catch (UnsupportedJwtException e) {
+                System.out.println("Unsupported JWT token");
+            } catch (IllegalArgumentException e) {
+                System.out.println("JWT claims string is empty.");
             }
         }
         return false;
     }
 
+    @Override
+    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        String email = authentication.getName();
+        String password = authentication.getCredentials().toString();
 
+        User user = userService.findUserByEmail(email);
+
+        if(passwordEncoder.matches(user.getPassword(), password)) {
+            throw new BadCredentialsException("UnAuthorized");
+        }
+
+        return new UsernamePasswordAuthenticationToken(email, password);
+    }
+
+    @Override
+    public boolean supports(Class<?> authentication) {
+        return authentication.equals(UsernamePasswordAuthenticationToken.class);
+    }
 }
