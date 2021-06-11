@@ -253,5 +253,53 @@ public class ReplyService {
         return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.REPLY_UPLOAD_SUCCESS, replyDto);
     }
 
+    @Transactional
+    public DefaultResponse<?> editReply(Long replyId, ReplyUpdateForm form, HttpServletRequest request) {
+        String token = tokenProvider.parseToken(request);
+        Long userId;
+        if (tokenProvider.validateToken(token)) {
+            userId = tokenProvider.getUserId(token);
+        } else {
+            return new DefaultResponse<>(StatusCode.FAIL_AUTH, ResponseMessage.NOT_FOUND_USER);
+        }
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            return new DefaultResponse<>(StatusCode.NOT_EXIST, ResponseMessage.NOT_FOUND_USER);
+        }
+        User user = userOptional.get();
+
+        Optional<Reply> replyOptional = replyRepository.findById(replyId);
+        if (replyOptional.isEmpty()) {
+            return new DefaultResponse<>(StatusCode.NOT_EXIST, ResponseMessage.NOT_FOUND_REPLY);
+        }
+        Reply reply = replyOptional.get();
+
+        if (isNotSameUser(user, reply.getUser())) {
+            return new DefaultResponse<>(StatusCode.CONDITION_FAIL, ResponseMessage.NOT_SAME_USER);
+        }
+
+        if (reply.getStatus() == ReplyStatus.SELECTED) {
+            return new DefaultResponse<>(StatusCode.CONDITION_FAIL, ResponseMessage.NOT_SAME_USER);
+        }
+
+        // 기존 이미지 경로 삭제
+        List<ReplyImage> replyImages = replyImageRepository.findByReply(reply);
+        replyImageRepository.deleteInBatch(replyImages);
+
+        // 수정된 내용 반영
+        List<ReplyImage> newReplyImages = ReplyImage.createReplyImages(form.getReply_image());
+        reply.setContent(form.getContent());
+        reply.setReplyImages(newReplyImages);
+
+        // 저장
+        replyImageRepository.saveAll(newReplyImages);
+        replyRepository.save(reply);
+
+        // DTO 변환
+        ReplyDto replyDto = ReplyMapper.replyToReplyDto(reply);
+
+        // response 객체 리턴
+        return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.REPLY_EDIT_SUCCESS, replyDto);
+    }
 
 }

@@ -25,11 +25,9 @@ public class ReplyController {
         return replyService.reply(form, request);
     }
 
-    @GetMapping("/reply/{id}")
-    public Page<ReplyDto> findReplies(
-            @PathVariable("id") Long postId, Pageable pageable) {
-        DefaultResponse<Page<ReplyDto>> response = replyService.findRepliesInPost(postId, pageable);
-        return response.getData();
+    @PutMapping("/reply/{id}/update")
+    public DefaultResponse<?> reply(@PathVariable("id") Long replyId, @RequestBody @Valid ReplyUpdateForm form, HttpServletRequest request) {
+        return replyService.editReply(replyId, form, request);
     }
 
     @Data
