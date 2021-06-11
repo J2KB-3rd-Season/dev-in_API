@@ -25,10 +25,10 @@ public class PostController {
         return postService.getPostInfoList(id, pageable);
     }
 
-    @GetMapping("/post/{id}")
+    @GetMapping("/postlist/{id}")
     public DefaultResponse<PostDetailsDto> findReplies(
             @PathVariable("id") Long postId,
-            @RequestParam("sort_reply") boolean sort_reply) {
+            @RequestParam(defaultValue = "true", name = "sort_reply") boolean sort_reply) {
         ReplyOrderCondition replyOrderCondition = new ReplyOrderCondition();
         if (!sort_reply) {
             replyOrderCondition.setLatestDate(true);

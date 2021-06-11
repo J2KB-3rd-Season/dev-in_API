@@ -5,6 +5,8 @@ import com.devin.dev.controller.reply.ReplyOrderCondition;
 import com.devin.dev.dto.post.*;
 import com.devin.dev.entity.post.*;
 import com.devin.dev.entity.reply.QReply;
+import com.devin.dev.entity.reply.QReplyImage;
+import com.devin.dev.entity.reply.QReplyLike;
 import com.devin.dev.entity.user.User;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.OrderSpecifier;
@@ -23,9 +25,12 @@ import java.util.stream.Collectors;
 
 import static com.devin.dev.entity.post.QPost.post;
 import static com.devin.dev.entity.post.QPostImage.postImage;
+import static com.devin.dev.entity.post.QPostLike.postLike;
 import static com.devin.dev.entity.post.QPostTag.postTag;
 import static com.devin.dev.entity.post.QSubject.subject;
 import static com.devin.dev.entity.reply.QReply.reply;
+import static com.devin.dev.entity.reply.QReplyImage.replyImage;
+import static com.devin.dev.entity.reply.QReplyLike.replyLike;
 import static com.devin.dev.entity.user.QUser.user;
 import static org.springframework.util.StringUtils.hasText;
 
@@ -120,7 +125,9 @@ public class PostRepositoryQueryImpl implements PostRepositoryQuery {
         Post result = queryFactory
                 .select(post)
                 .from(post)
-                .leftJoin(post.replies, reply).fetchJoin()
+                .innerJoin(post.replies, reply).fetchJoin()
+                .innerJoin(post.user, user).fetchJoin()
+                .innerJoin(reply.user, user).fetchJoin()
                 .where(post.id.eq(id))
                 .orderBy(
                         replyOrder(condition)
