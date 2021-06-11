@@ -1,5 +1,6 @@
 package com.devin.dev.controller.reply;
 
+import com.devin.dev.controller.post.ReplyUpdateForm;
 import com.devin.dev.dto.reply.ReplyDto;
 import com.devin.dev.model.DefaultResponse;
 import com.devin.dev.service.ReplyService;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import java.util.List;
@@ -30,6 +32,11 @@ public class ReplyController {
         return replyService.editReply(replyId, form, request);
     }
 
+    @DeleteMapping("/reply/{id}")
+    public DefaultResponse<?> reply(@PathVariable("id") Long replyId, HttpServletRequest request) {
+        return replyService.deleteReply(replyId, request);
+    }
+
     @Data
     private static class CreateReplyResponse {
         private Long id;
@@ -37,18 +44,6 @@ public class ReplyController {
         public CreateReplyResponse(Long id) {
             this.id = id;
         }
-    }
-
-    @Data
-    private static class CreateReplyRequest {
-        @NotEmpty
-        private Long postId;
-        @NotEmpty
-        private Long userId;
-        @NotEmpty
-        private String content;
-        @NotEmpty
-        private List<String> replyImages;
     }
 
     @Data

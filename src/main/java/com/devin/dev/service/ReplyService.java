@@ -302,4 +302,44 @@ public class ReplyService {
         return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.REPLY_EDIT_SUCCESS, replyDto);
     }
 
+    @Transactional
+    public DefaultResponse<?> deleteReply(Long replyId, HttpServletRequest request) {
+        String token = tokenProvider.parseToken(request);
+        Long userId;
+        if (tokenProvider.validateToken(token)) {
+            userId = tokenProvider.getUserId(token);
+        } else {
+            return new DefaultResponse<>(StatusCode.FAIL_AUTH, ResponseMessage.NOT_FOUND_USER);
+        }
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            return new DefaultResponse<>(StatusCode.NOT_EXIST, ResponseMessage.NOT_FOUND_USER);
+        }
+        User user = userOptional.get();
+
+        Optional<Reply> replyOptional = replyRepository.findById(replyId);
+        if (replyOptional.isEmpty()) {
+            return new DefaultResponse<>(StatusCode.NOT_EXIST, ResponseMessage.NOT_FOUND_REPLY);
+        }
+        Reply reply = replyOptional.get();
+
+        // 작성자 확인
+        if (isNotSameUser(user, reply.getUser())) {
+            return new DefaultResponse<>(StatusCode.CONDITION_FAIL, ResponseMessage.NOT_SAME_USER);
+        }
+
+        // 채택된 답변인지 확인
+        if (reply.getStatus() == ReplyStatus.SELECTED) {
+            return new DefaultResponse<>(StatusCode.CONDITION_FAIL, ResponseMessage.CANNOT_DELETE_SELECTED);
+        }
+
+        // 리플 작성자 경험치 삭제
+        user.changeExp(User.ExpChangeType.DELETE_REPLY);
+
+        // 댓글 상태변경 DELETED 후 저장
+        reply.setStatus(ReplyStatus.DELETED);
+        replyRepository.save(reply);
+
+        return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.REPLY_DELETE_SUCCESS);
+    }
 }
