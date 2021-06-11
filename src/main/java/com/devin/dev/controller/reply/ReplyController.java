@@ -42,6 +42,11 @@ public class ReplyController {
         return replyService.changeReplyLike(replyId, request);
     }
 
+    @PatchMapping("/reply/{id}/select")
+    public DefaultResponse<?> selectReply(@PathVariable("id") Long replyId, HttpServletRequest request) {
+        return replyService.selectReply(replyId, request);
+    }
+
     @Data
     private static class CreateReplyResponse {
         private Long id;

@@ -12,6 +12,7 @@ public enum ResponseMessage {
     NOT_FOUND_REPLY("답변을 찾을 수 없습니다."),
     NOT_FOUND_SUBJECT("주제를 찾을 수 없습니다."),
     NOT_SAME_USER("작성자가 아닙니다."),
+    SAME_USER("작성자 입니다."),
     CANNOT_DELETE_SELECTED("채택된 답변은 삭제할 수 없습니다."),
     CREATED_USER("회원 가입 성공"),
     UPDATE_USER("회원 정보 수정 성공"),

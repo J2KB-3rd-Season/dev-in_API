@@ -6,6 +6,7 @@ import com.devin.dev.dto.reply.ReplyDto;
 import com.devin.dev.dto.reply.ReplyLikeDto;
 import com.devin.dev.dto.reply.ReplyMapper;
 import com.devin.dev.entity.post.Post;
+import com.devin.dev.entity.post.PostStatus;
 import com.devin.dev.entity.reply.Reply;
 import com.devin.dev.entity.reply.ReplyImage;
 import com.devin.dev.entity.reply.ReplyLike;
@@ -388,6 +389,50 @@ public class ReplyService {
             }
             replyLikeRepository.save(replyLike);
         }
+
+        ReplyDto replyDto = new ReplyDto(reply);
+
+        return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.REPLY_LIKE_CHANGE_SUCCESS, replyDto);
+    }
+
+    public DefaultResponse<?> selectReply(Long replyId, HttpServletRequest request) {
+        String token = tokenProvider.parseToken(request);
+        Long userId;
+        if (tokenProvider.validateToken(token)) {
+            userId = tokenProvider.getUserId(token);
+        } else {
+            return new DefaultResponse<>(StatusCode.FAIL_AUTH, ResponseMessage.NOT_FOUND_USER);
+        }
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            return new DefaultResponse<>(StatusCode.NOT_EXIST, ResponseMessage.NOT_FOUND_USER);
+        }
+        User user = userOptional.get();
+
+        Optional<Reply> replyOptional = replyRepository.findById(replyId);
+        if (replyOptional.isEmpty()) {
+            return new DefaultResponse<>(StatusCode.NOT_EXIST, ResponseMessage.NOT_FOUND_REPLY);
+        }
+        Reply reply = replyOptional.get();
+
+        if (isNotSameUser(user, reply.getPost().getUser())) {
+            return new DefaultResponse<>(StatusCode.CONDITION_FAIL, ResponseMessage.NOT_SAME_USER);
+        }
+
+        if (user.getId().equals(reply.getUser().getId())) {
+            return new DefaultResponse<>(StatusCode.CONDITION_FAIL, ResponseMessage.SAME_USER);
+        }
+
+        user.changeExp(User.ExpChangeType.REPLY_SELECT);
+        reply.getUser().changeExp(User.ExpChangeType.REPLY_BE_SELECTED);
+
+        reply.setStatus(ReplyStatus.SELECTED);
+        reply.getPost().setStatus(PostStatus.SELECTED);
+
+        replyRepository.save(reply);
+        userRepository.save(user);
+        userRepository.save(reply.getUser());
+        postRepository.save(reply.getPost());
 
         ReplyDto replyDto = new ReplyDto(reply);
 
