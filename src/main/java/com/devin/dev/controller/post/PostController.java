@@ -41,7 +41,7 @@ public class PostController {
         return postService.getPostInfoListByCondition(condition, pageable);
     }
 
-    @DeleteMapping("/postlist/{id}")
+    @DeleteMapping("/post/{id}")
     public DefaultResponse<PostDetailsDto> deletePost(@PathVariable("id") Long postId) {
         return postService.deletePost(postId);
     }

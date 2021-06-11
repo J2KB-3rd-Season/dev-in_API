@@ -52,7 +52,7 @@ class PostControllerTest {
     @WithMockUser
     void requestDeleteSucceeded() throws Exception {
         List<Post> posts = postRepository.findByTitle("title_2");
-        mvc.perform(delete("/postlist/" + posts.get(0).getId()))
+        mvc.perform(delete("/post/" + posts.get(0).getId()))
                 .andDo(print());
     }
 }
