@@ -187,7 +187,7 @@ public class ReplyService {
 
         // 채택된 답변인지 확인
         if (reply.getStatus() == ReplyStatus.SELECTED) {
-            return new DefaultResponse<>(StatusCode.CONDITION_FAIL, ResponseMessage.CANNOT_DELETE_SELECTED);
+            return new DefaultResponse<>(StatusCode.CONDITION_FAIL, ResponseMessage.SELECTED_REPLY);
         }
 
         // 리플 작성자 경험치 삭제
@@ -280,7 +280,7 @@ public class ReplyService {
         }
 
         if (reply.getStatus() == ReplyStatus.SELECTED) {
-            return new DefaultResponse<>(StatusCode.CONDITION_FAIL, ResponseMessage.NOT_SAME_USER);
+            return new DefaultResponse<>(StatusCode.CONDITION_FAIL, ResponseMessage.SELECTED_REPLY);
         }
 
         // 기존 이미지 경로 삭제
@@ -310,7 +310,7 @@ public class ReplyService {
         if (tokenProvider.validateToken(token)) {
             userId = tokenProvider.getUserId(token);
         } else {
-            return new DefaultResponse<>(StatusCode.FAIL_AUTH, ResponseMessage.NOT_FOUND_USER);
+            return new DefaultResponse<>(StatusCode.FAIL_AUTH, ResponseMessage.LOGIN_FAIL);
         }
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty()) {
@@ -331,7 +331,7 @@ public class ReplyService {
 
         // 채택된 답변인지 확인
         if (reply.getStatus() == ReplyStatus.SELECTED) {
-            return new DefaultResponse<>(StatusCode.CONDITION_FAIL, ResponseMessage.CANNOT_DELETE_SELECTED);
+            return new DefaultResponse<>(StatusCode.CONDITION_FAIL, ResponseMessage.SELECTED_REPLY);
         }
 
         // 리플 작성자 경험치 삭제

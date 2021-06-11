@@ -28,17 +28,17 @@ public class ReplyController {
     }
 
     @PutMapping("/reply/{id}/update")
-    public DefaultResponse<?> reply(@PathVariable("id") Long replyId, @RequestBody @Valid ReplyUpdateForm form, HttpServletRequest request) {
+    public DefaultResponse<?> editReply(@PathVariable("id") Long replyId, @RequestBody @Valid ReplyUpdateForm form, HttpServletRequest request) {
         return replyService.editReply(replyId, form, request);
     }
 
     @DeleteMapping("/reply/{id}")
-    public DefaultResponse<?> reply(@PathVariable("id") Long replyId, HttpServletRequest request) {
+    public DefaultResponse<?> deleteReply(@PathVariable("id") Long replyId, HttpServletRequest request) {
         return replyService.deleteReply(replyId, request);
     }
 
     @PatchMapping("/reply/{id}/like")
-    public DefaultResponse<?> changePostLike(@PathVariable("id") Long replyId, HttpServletRequest request) {
+    public DefaultResponse<?> changeReplyLike(@PathVariable("id") Long replyId, HttpServletRequest request) {
         return replyService.changeReplyLike(replyId, request);
     }
 

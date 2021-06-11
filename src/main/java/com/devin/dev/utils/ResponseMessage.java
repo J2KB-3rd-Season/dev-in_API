@@ -12,8 +12,9 @@ public enum ResponseMessage {
     NOT_FOUND_REPLY("답변을 찾을 수 없습니다."),
     NOT_FOUND_SUBJECT("주제를 찾을 수 없습니다."),
     NOT_SAME_USER("작성자가 아닙니다."),
+    NO_AUTHORITY("권한이 없습니다."),
     SAME_USER("작성자 입니다."),
-    CANNOT_DELETE_SELECTED("채택된 답변은 삭제할 수 없습니다."),
+    SELECTED_REPLY("채택된 답변 입니다."),
     CREATED_USER("회원 가입 성공"),
     UPDATE_USER("회원 정보 수정 성공"),
     DELETE_USER("회원 탈퇴 성공"),
@@ -32,7 +33,8 @@ public enum ResponseMessage {
     EXIST_USER_EMAIL("이미 존재하는 회원 메일"),
     EXIST_SUBJECT("이미 존재하는 주제"),
     DELETE_SUBJECT("관심 주제 삭제 성공"),
-    DB_ERROR("데이터베이스 에러");
+    DB_ERROR("데이터베이스 에러"),
+    FOUND_SUBJECT("관심 주제 조회 성공");
 
     ResponseMessage(String message) {
     }
