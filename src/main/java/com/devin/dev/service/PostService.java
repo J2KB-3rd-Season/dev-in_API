@@ -1,9 +1,9 @@
 package com.devin.dev.service;
 
 import com.devin.dev.controller.post.PostSearchCondition;
+import com.devin.dev.controller.reply.ReplyOrderCondition;
 import com.devin.dev.dto.post.PostDetailsDto;
 import com.devin.dev.dto.post.PostInfoDto;
-import com.devin.dev.dto.post.PostSimpleDto;
 import com.devin.dev.entity.post.Post;
 import com.devin.dev.entity.post.PostImage;
 import com.devin.dev.entity.post.PostTag;
@@ -21,7 +21,6 @@ import com.devin.dev.repository.user.UserRepository;
 import com.devin.dev.utils.ResponseMessage;
 import com.devin.dev.utils.StatusCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -121,12 +120,23 @@ public class PostService {
         return new DefaultResponse<>(StatusCode.OK, ResponseMessage.POST_EDIT_SUCCESS);
     }
 
+    @Transactional
+    public DefaultResponse<PostDetailsDto> getPost(Long postId, ReplyOrderCondition replyOrderCondition) {
+        Optional<PostDetailsDto> postOptional = postRepository.findPostDetailsById(postId, replyOrderCondition);
+        if (postOptional.isEmpty()) {
+            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_FOUND_POST);
+        }
+        PostDetailsDto postDetailsDto = postOptional.get();
+
+        return new DefaultResponse<>(StatusCode.OK, ResponseMessage.FOUND_POST, postDetailsDto);
+    }
+
     // 게시글 검색
     @Transactional
-    public DefaultResponse<Page<PostSimpleDto>> searchPosts(PostSearchCondition condition, Pageable pageable) {
-        Page<PostSimpleDto> postDtos = postRepository.findPostDtoPageWithCondition(condition, pageable);
+    public DefaultResponse<Page<PostInfoDto>> getPostInfoListByCondition(PostSearchCondition condition, Pageable pageable) {
+        Page<PostInfoDto> postDtos = postRepository.findPostInfoDtoPageByCondition(condition, pageable);
 
-        PageImpl<PostSimpleDto> page = new PageImpl<>(postDtos.toList(), pageable, postDtos.getTotalElements());
+        PageImpl<PostInfoDto> page = new PageImpl<>(postDtos.toList(), pageable, postDtos.getTotalElements());
 
         return new DefaultResponse<>(StatusCode.OK, ResponseMessage.FOUND_POST, page);
     }

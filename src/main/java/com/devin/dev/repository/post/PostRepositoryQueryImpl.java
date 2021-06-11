@@ -1,11 +1,13 @@
 package com.devin.dev.repository.post;
 
 import com.devin.dev.controller.post.PostSearchCondition;
-import com.devin.dev.dto.post.PostSimpleDto;
-import com.devin.dev.dto.post.QPostSimpleDto;
+import com.devin.dev.controller.reply.ReplyOrderCondition;
+import com.devin.dev.dto.post.*;
 import com.devin.dev.entity.post.*;
+import com.devin.dev.entity.reply.QReply;
 import com.devin.dev.entity.user.User;
 import com.querydsl.core.QueryResults;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -16,10 +18,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.devin.dev.entity.post.QPost.post;
+import static com.devin.dev.entity.post.QPostImage.postImage;
 import static com.devin.dev.entity.post.QPostTag.postTag;
 import static com.devin.dev.entity.post.QSubject.subject;
+import static com.devin.dev.entity.reply.QReply.reply;
 import static com.devin.dev.entity.user.QUser.user;
 import static org.springframework.util.StringUtils.hasText;
 
@@ -55,18 +61,12 @@ public class PostRepositoryQueryImpl implements PostRepositoryQuery {
 
      */
     @Override
-    public Page<PostSimpleDto> findPostDtoPageWithCondition(PostSearchCondition condition, Pageable pageable) {
-        QueryResults<PostSimpleDto> results = queryFactory
-                .selectDistinct(new QPostSimpleDto(
-                        post.title,
-                        user.name,
-                        post.content,
-                        post.status,
-                        post.replies.size()
-                ))
+    public Page<PostInfoDto> findPostInfoDtoPageByCondition(PostSearchCondition condition, Pageable pageable) {
+        QueryResults<Post> results = queryFactory
+                .selectDistinct(post)
                 .from(post)
-                .innerJoin(post.user, user)
-                .innerJoin(post.tags, postTag)
+                .leftJoin(post.user, user)
+                .leftJoin(post.tags, postTag)
                 .where(
                         usernameLike(condition.getUsername()),
                         titleLike(condition.getTitle()),
@@ -76,7 +76,9 @@ public class PostRepositoryQueryImpl implements PostRepositoryQuery {
                 .limit(pageable.getPageSize())
                 .fetchResults();
 
-        List<PostSimpleDto> content = results.getResults();
+        List<Post> posts = results.getResults();
+
+        List<PostInfoDto> content = posts.stream().map(PostInfoDto::new).collect(Collectors.toList());
 
         long total = results.getTotal();
 
@@ -113,6 +115,29 @@ public class PostRepositoryQueryImpl implements PostRepositoryQuery {
         return new PageImpl<>(content, pageable, total);
     }
 
+    @Override
+    public Optional<PostDetailsDto> findPostDetailsById(Long id, ReplyOrderCondition condition) {
+        Post result = queryFactory
+                .select(post)
+                .from(post)
+                .leftJoin(post.replies, reply).fetchJoin()
+                .where(post.id.eq(id))
+                .orderBy(
+                        replyOrder(condition)
+                )
+                .fetchOne();
+
+        Optional<PostDetailsDto> postDetailsDtoOptional;
+
+        postDetailsDtoOptional = result != null ? Optional.of(new PostDetailsDto(result)) : Optional.empty();
+
+        return postDetailsDtoOptional;
+    }
+
+    private OrderSpecifier<?> replyOrder(ReplyOrderCondition condition) {
+        return condition.isLatestDate() ? reply.lastModifiedDate.asc() : reply.likes.size().asc();
+    }
+
     private BooleanExpression usernameLike(String username) {
         return hasText(username) ? user.name.contains(username) : null;
     }
@@ -133,4 +158,5 @@ public class PostRepositoryQueryImpl implements PostRepositoryQuery {
 
         return postTag.in(where);//(where);
     }
+
 }

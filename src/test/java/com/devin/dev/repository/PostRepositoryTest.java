@@ -1,6 +1,7 @@
 package com.devin.dev.repository;
 
 import com.devin.dev.controller.post.PostSearchCondition;
+import com.devin.dev.dto.post.PostInfoDto;
 import com.devin.dev.dto.post.PostSimpleDto;
 import com.devin.dev.entity.post.Post;
 import com.devin.dev.entity.post.PostTag;
@@ -162,7 +163,7 @@ class PostRepositoryTest {
         condition.setUsername("A");
         condition.setTitle("Post");
         Pageable pageable = PageRequest.of(0, 4);
-        Page<PostSimpleDto> postDtoPage = postRepository.findPostDtoPageWithCondition(condition, pageable);
+        Page<PostInfoDto> postDtoPage = postRepository.findPostInfoDtoPageByCondition(condition, pageable);
         assertThat(postDtoPage).extracting("title").containsExactly("PostA1", "PostA2");
     }
 }
