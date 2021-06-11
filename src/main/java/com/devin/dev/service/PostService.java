@@ -210,6 +210,60 @@ public class PostService {
 
         return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.DELETED_POST);
     }
+
+    public DefaultResponse<?> changePostLike(Long postId, HttpServletRequest request) {
+        String token = tokenProvider.parseToken(request);
+        Long userId;
+        if (tokenProvider.validateToken(token)) {
+            userId = tokenProvider.getUserId(token);
+        } else {
+            return new DefaultResponse<>(StatusCode.FAIL_AUTH, ResponseMessage.NOT_FOUND_USER);
+        }
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            return new DefaultResponse<>(StatusCode.NOT_EXIST, ResponseMessage.NOT_FOUND_USER);
+        }
+        User user = userOptional.get();
+
+        Optional<Post> postOptional = postRepository.findById(postId);
+        if (postOptional.isEmpty()) {
+            return new DefaultResponse<>(StatusCode.NOT_EXIST, ResponseMessage.NOT_FOUND_POST);
+        }
+        Post post = postOptional.get();
+
+        Optional<PostLike> likeOptional = postLikeRepository.findByPostAndUser(post, user);
+
+        PostLike postLike;
+        // 추천 유무에 따라 실행
+        if (likeOptional.isPresent()) {
+            postLike = likeOptional.get();
+            postLikeRepository.delete(postLike);
+            if (isNotSameUser(user, post.getUser())) {
+                // 좋아요 누른 사람 경험치 감소
+                user.changeExp(User.ExpChangeType.REPLY_CANCEL_LIKE);
+                // 답변 작성자 경험치 감소
+                post.getUser().changeExp(User.ExpChangeType.REPLY_NOT_BE_LIKED);
+            }
+        } else {
+            postLike = post.like(user, new PostLike());
+            if (isNotSameUser(user, post.getUser())) {
+                // 좋아요 누른 사람 경험치 증가
+                user.changeExp(User.ExpChangeType.REPLY_LIKE);
+                // 답변 작성자 경험치 증가
+                post.getUser().changeExp(User.ExpChangeType.REPLY_BE_LIKED);
+            }
+            postLikeRepository.save(postLike);
+        }
+
+        ReplyLikeDto replyLikeDto = new ReplyLikeDto(postLike.getId(), user.getName());
+
+        return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.REPLY_LIKE_CHANGE_SUCCESS, replyLikeDto);
+
+    }
+
+    private boolean isNotSameUser(User firstUser, User secondUser) {
+        return !firstUser.getId().equals(secondUser.getId());
+    }
 }
 
 

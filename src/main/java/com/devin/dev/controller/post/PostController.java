@@ -3,7 +3,6 @@ package com.devin.dev.controller.post;
 import com.devin.dev.controller.reply.ReplyOrderCondition;
 import com.devin.dev.dto.post.PostDetailsDto;
 import com.devin.dev.model.DefaultResponse;
-import com.devin.dev.security.JwtAuthTokenProvider;
 import com.devin.dev.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
@@ -52,6 +51,12 @@ public class PostController {
 
     @PostMapping("/post")
     public DefaultResponse<?> post(@RequestBody PostForm form, HttpServletRequest request) {
-        return postService.post(request, form);
+        return postService.post(form, request);
     }
+
+    @PatchMapping("/post/{id}/like")
+    public DefaultResponse<?> changePostLike(@PathVariable("id") Long postId, HttpServletRequest request) {
+        return postService.changePostLike(postId, request);
+    }
+
 }

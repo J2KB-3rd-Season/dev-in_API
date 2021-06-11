@@ -125,9 +125,9 @@ public class PostRepositoryQueryImpl implements PostRepositoryQuery {
         Post result = queryFactory
                 .select(post)
                 .from(post)
-                .innerJoin(post.replies, reply).fetchJoin()
-                .innerJoin(post.user, user).fetchJoin()
-                .innerJoin(reply.user, user).fetchJoin()
+                .leftJoin(post.replies, reply).fetchJoin()
+                .leftJoin(post.user, user).fetchJoin()
+                .leftJoin(reply.user, user).fetchJoin()
                 .where(post.id.eq(id))
                 .orderBy(
                         replyOrder(condition)
