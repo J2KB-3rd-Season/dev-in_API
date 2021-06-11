@@ -20,9 +20,9 @@ public class ReplyController {
 
     private final ReplyService replyService;
 
-    @PostMapping("/replies")
-    public DefaultResponse<?> saveReply(@RequestBody @Valid CreateReplyRequest request) {
-        return replyService.reply(request.getUserId(), request.getPostId(), request.getContent(), request.getReplyImages());
+    @PostMapping("/reply")
+    public DefaultResponse<?> reply(@RequestBody @Valid ReplyForm form, HttpServletRequest request) {
+        return replyService.reply(form, request);
     }
 
     @GetMapping("/reply/{id}")

@@ -1,5 +1,7 @@
 package com.devin.dev.service;
 
+import com.devin.dev.controller.post.ReplyUpdateForm;
+import com.devin.dev.controller.reply.ReplyForm;
 import com.devin.dev.dto.reply.ReplyDto;
 import com.devin.dev.dto.reply.ReplyLikeDto;
 import com.devin.dev.dto.reply.ReplyMapper;
@@ -15,6 +17,7 @@ import com.devin.dev.repository.reply.ReplyRepository;
 import com.devin.dev.repository.reply.ReplyImageRepository;
 import com.devin.dev.repository.reply.ReplyLikeRepository;
 import com.devin.dev.repository.user.UserRepository;
+import com.devin.dev.security.JwtAuthTokenProvider;
 import com.devin.dev.utils.ResponseMessage;
 import com.devin.dev.utils.StatusCode;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +27,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,6 +40,7 @@ public class ReplyService {
     private final ReplyRepository replyRepository;
     private final ReplyImageRepository replyImageRepository;
     private final ReplyLikeRepository replyLikeRepository;
+    private final JwtAuthTokenProvider tokenProvider;
 
     // 답변 작성
     @Transactional
@@ -206,5 +211,47 @@ public class ReplyService {
     private boolean isNotSameUser(User firstUser, User secondUser) {
         return !firstUser.getId().equals(secondUser.getId());
     }
+
+    @Transactional
+    public DefaultResponse<?> reply(ReplyForm form, HttpServletRequest request) {
+        String token = tokenProvider.parseToken(request);
+        Long userId;
+        if (tokenProvider.validateToken(token)) {
+            userId = tokenProvider.getUserId(token);
+        } else {
+            return new DefaultResponse<>(StatusCode.FAIL_AUTH, ResponseMessage.NOT_FOUND_USER);
+        }
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            return new DefaultResponse<>(StatusCode.NOT_EXIST, ResponseMessage.NOT_FOUND_USER);
+        }
+        User user = userOptional.get();
+
+        Optional<Post> postOptional = postRepository.findById(form.getId());
+        if (postOptional.isEmpty()) {
+            return new DefaultResponse<>(StatusCode.NOT_EXIST, ResponseMessage.NOT_FOUND_POST);
+        }
+        Post post = postOptional.get();
+
+        // 엔티티 생성
+        List<ReplyImage> replyImages = ReplyImage.createReplyImages(form.getReply_image());
+        Reply reply = Reply.createReplyWithImages(post, user, replyImages, form.getContent());
+
+        // 리플 작성자 경험치증가 (게시글작성자 != 리플작성자 인 경우)
+        if (isNotSameUser(post.getUser(), reply.getUser())) {
+            user.changeExp(User.ExpChangeType.CREATE_REPLY);
+        }
+
+        // 저장
+        replyRepository.save(reply);
+        replyImageRepository.saveAll(replyImages);
+
+        // DTO 변환
+        ReplyDto replyDto = ReplyMapper.replyToReplyDto(reply);
+
+        // response 객체 리턴
+        return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.REPLY_UPLOAD_SUCCESS, replyDto);
+    }
+
 
 }
