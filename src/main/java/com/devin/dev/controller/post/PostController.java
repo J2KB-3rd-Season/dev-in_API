@@ -60,4 +60,9 @@ public class PostController {
         return postService.changePostLike(postId, request);
     }
 
+    @PutMapping("/post/{id}/update")
+    public DefaultResponse<?> reply(@PathVariable("id") Long replyId, @RequestBody PostUpdateForm form, HttpServletRequest request) {
+        return postService.editPost(replyId, form, request);
+    }
+
 }

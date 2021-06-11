@@ -122,7 +122,7 @@ public class PostRepositoryQueryImpl implements PostRepositoryQuery {
     }
 
     @Override
-    public Optional<PostDetailsDto> findPostDetailsById(Long id, ReplyOrderCondition condition) {
+    public Optional<PostDetailsDto> findPostDetailsByIdWithUserType(Long id, UserStatus status, ReplyOrderCondition condition) {
         Post result = queryFactory
                 .select(post)
                 .from(post)

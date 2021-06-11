@@ -2,6 +2,8 @@ package com.devin.dev.service;
 
 import com.devin.dev.controller.post.PostForm;
 import com.devin.dev.controller.post.PostSearchCondition;
+import com.devin.dev.controller.post.PostUpdateForm;
+import com.devin.dev.controller.post.ReplyUpdateForm;
 import com.devin.dev.controller.reply.ReplyOrderCondition;
 import com.devin.dev.dto.post.PostDetailsDto;
 import com.devin.dev.dto.post.PostInfoDto;
@@ -282,6 +284,58 @@ public class PostService {
 
     private boolean isNotSameUser(User firstUser, User secondUser) {
         return !firstUser.getId().equals(secondUser.getId());
+    }
+
+    @Transactional
+    public DefaultResponse<?> editPost(Long postId, PostUpdateForm form, HttpServletRequest request) {
+        String token = tokenProvider.parseToken(request);
+        Long userId;
+        if (tokenProvider.validateToken(token)) {
+            userId = tokenProvider.getUserId(token);
+        } else {
+            return new DefaultResponse<>(StatusCode.FAIL_AUTH, ResponseMessage.NOT_FOUND_USER);
+        }
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            return new DefaultResponse<>(StatusCode.NOT_EXIST, ResponseMessage.NOT_FOUND_USER);
+        }
+        Optional<Post> postOptional = postRepository.findById(postId);
+        if (postOptional.isEmpty()) {
+            return new DefaultResponse<>(StatusCode.NOT_EXIST, ResponseMessage.NOT_FOUND_POST);
+        }
+        Post post = postOptional.get();
+        List<Subject> postSubjects = subjectRepository.findByNameIn(form.getPost_tags());
+
+        // 기존 태그 및 이미지 경로 삭제
+        List<PostImage> postImages = postImageRepository.findByPost(post);
+        postImageRepository.deleteInBatch(postImages);
+
+        // 수정된 내용 반영
+        List<PostImage> newPostImages = PostImage.createPostImages(form.getPost_images());
+        post.setTitle(form.getTitle());
+        post.setContent(form.getContent());
+        List<PostTag> deleteList = new ArrayList<>();
+
+        for (PostTag tag : post.getTags()) {
+            if (!postSubjects.contains(tag.getTag())) {
+                deleteList.add(tag);
+            } else {
+                postSubjects.remove(tag.getTag());
+            }
+        }
+        List<PostTag> newPostTags = PostTag.createPostTags(postSubjects);
+        postTagRepository.deleteInBatch(deleteList);
+
+        post.setPostTags(newPostTags);
+        post.setPostImages(newPostImages);
+
+        // 저장
+        postImageRepository.saveAll(newPostImages);
+        postRepository.save(post);
+        postTagRepository.saveAll(newPostTags);
+
+        // 성공 메시지 및 코드 반환
+        return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.POST_EDIT_SUCCESS);
     }
 }
 
