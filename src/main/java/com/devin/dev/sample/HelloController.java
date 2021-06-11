@@ -75,13 +75,4 @@ public class HelloController {
         return "main";
     }
 
-    @GetMapping("/setting")
-    public String createSampleData() {
-        sampleData.createSubjects();
-        sampleData.createUsers();
-        sampleData.createPosts();
-        sampleData.createReplies();
-
-        return "redirect:/";
-    }
 }
