@@ -1,12 +1,11 @@
 package com.devin.dev.service;
 
+import com.devin.dev.controller.post.PostForm;
 import com.devin.dev.controller.post.PostSearchCondition;
 import com.devin.dev.controller.reply.ReplyOrderCondition;
 import com.devin.dev.dto.post.PostDetailsDto;
 import com.devin.dev.dto.post.PostInfoDto;
 import com.devin.dev.entity.post.*;
-import com.devin.dev.entity.reply.Reply;
-import com.devin.dev.entity.reply.ReplyImage;
 import com.devin.dev.entity.user.User;
 import com.devin.dev.model.DefaultResponse;
 import com.devin.dev.repository.post.PostImageRepository;
@@ -18,6 +17,7 @@ import com.devin.dev.repository.reply.ReplyImageRepository;
 import com.devin.dev.repository.reply.ReplyLikeRepository;
 import com.devin.dev.repository.subject.SubjectRepository;
 import com.devin.dev.repository.user.UserRepository;
+import com.devin.dev.security.JwtAuthTokenProvider;
 import com.devin.dev.utils.ResponseMessage;
 import com.devin.dev.utils.StatusCode;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +27,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -45,6 +46,44 @@ public class PostService {
     private final ReplyRepository replyRepository;
     private final ReplyImageRepository replyImageRepository;
     private final ReplyLikeRepository replyLikeRepository;
+    private final JwtAuthTokenProvider tokenProvider;
+
+    @Transactional
+    public DefaultResponse<?> post(HttpServletRequest request, PostForm form) {
+        String token = tokenProvider.parseToken(request);
+        Long userId;
+        if (tokenProvider.validateToken(token)) {
+            userId = tokenProvider.getUserId(token);
+        } else {
+            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_FOUND_USER);
+        }
+
+        // 엔티티 조회. 실패시 에러코드 반환
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_FOUND_USER);
+        }
+        User user = userOptional.get();
+        List<Subject> postSubjects = subjectRepository.findByNameIn(form.getPost_tags());
+
+        // 엔티티 생성
+        List<PostImage> postImages = PostImage.createPostImages(form.getPost_images());
+        List<PostTag> postTags = PostTag.createPostTags(postSubjects);
+        Post post = Post.createPostWithImages(user, form.getTitle(), form.getContent(), postTags, postImages);
+
+        // 게시글 작성자 경험치증가
+        user.changeExp(User.ExpChangeType.CREATE_POST);
+
+        // 저장
+        postRepository.save(post);
+        postImageRepository.saveAll(postImages);
+        postTagRepository.saveAll(postTags);
+
+        PostDetailsDto postDetailsDto = new PostDetailsDto(post);
+
+        // 성공 메시지 및 코드 반환
+        return new DefaultResponse<>(StatusCode.OK, ResponseMessage.POST_UPLOAD_SUCCESS, postDetailsDto);
+    }
 
     @Transactional
     public DefaultResponse<PostDetailsDto> post(Long userId, String title, String content, List<String> tags, List<String> imagePaths) {
@@ -169,3 +208,5 @@ public class PostService {
         return new DefaultResponse<>(StatusCode.OK, ResponseMessage.DELETED_POST);
     }
 }
+
+
