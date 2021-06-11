@@ -69,6 +69,12 @@ public class SubjectService {
         return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.CREATED_SUBJECT);
     }
 
+    @Transactional(readOnly = true)
+    public DefaultResponse<List<String>> getSubject() {
+        List<String> subjects = subjectRepository.findAll().stream().map(Subject::getName).collect(Collectors.toList());
+        return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.FOUND_SUBJECT, subjects);
+    }
+
     @Transactional
     public DefaultResponse<?> removeSubject(String name) {
         Optional<Subject> subjectOptional = subjectRepository.findByName(name);

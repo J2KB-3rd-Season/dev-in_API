@@ -26,4 +26,10 @@ public class SubjectController {
     public DefaultResponse<?> deleteSubject(@RequestBody SubjectForm form, HttpServletRequest request) {
         return subjectService.removeSubject(form, request);
     }
+
+    @GetMapping("/tags")
+    public DefaultResponse<?> getSubject() {
+        return subjectService.getSubject();
+    }
+
 }
