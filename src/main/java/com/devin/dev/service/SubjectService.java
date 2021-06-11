@@ -1,6 +1,7 @@
 package com.devin.dev.service;
 
 import com.devin.dev.controller.subject.SubjectForm;
+import com.devin.dev.dto.subject.SubjectDto;
 import com.devin.dev.entity.post.Subject;
 import com.devin.dev.entity.user.User;
 import com.devin.dev.entity.user.UserStatus;
@@ -70,9 +71,9 @@ public class SubjectService {
     }
 
     @Transactional(readOnly = true)
-    public DefaultResponse<List<String>> getSubject() {
-        List<String> subjects = subjectRepository.findAll().stream().map(Subject::getName).collect(Collectors.toList());
-        return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.FOUND_SUBJECT, subjects);
+    public DefaultResponse<List<SubjectDto>> getSubject() {
+        List<SubjectDto> subjectDtos = subjectRepository.findAll().stream().map(SubjectDto::new).collect(Collectors.toList());
+        return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.FOUND_SUBJECT, subjectDtos);
     }
 
     @Transactional
