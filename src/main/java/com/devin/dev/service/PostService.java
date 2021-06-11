@@ -4,13 +4,13 @@ import com.devin.dev.controller.post.PostSearchCondition;
 import com.devin.dev.controller.reply.ReplyOrderCondition;
 import com.devin.dev.dto.post.PostDetailsDto;
 import com.devin.dev.dto.post.PostInfoDto;
-import com.devin.dev.entity.post.Post;
-import com.devin.dev.entity.post.PostImage;
-import com.devin.dev.entity.post.PostTag;
-import com.devin.dev.entity.post.Subject;
+import com.devin.dev.entity.post.*;
+import com.devin.dev.entity.reply.Reply;
+import com.devin.dev.entity.reply.ReplyImage;
 import com.devin.dev.entity.user.User;
 import com.devin.dev.model.DefaultResponse;
 import com.devin.dev.repository.post.PostImageRepository;
+import com.devin.dev.repository.post.PostLikeRepository;
 import com.devin.dev.repository.post.PostRepository;
 import com.devin.dev.repository.post.PostTagRepository;
 import com.devin.dev.repository.reply.ReplyRepository;
@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +39,7 @@ public class PostService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final PostImageRepository postImageRepository;
+    private final PostLikeRepository postLikeRepository;
     private final PostTagRepository postTagRepository;
     private final SubjectRepository subjectRepository;
     private final ReplyRepository replyRepository;
@@ -147,5 +149,23 @@ public class PostService {
         Page<PostInfoDto> postInfoDtos = posts.map(PostInfoDto::new);
         PageImpl<PostInfoDto> postInfoDtosImpl = new PageImpl<>(postInfoDtos.toList(), pageable, postInfoDtos.getTotalElements());
         return new DefaultResponse<>(StatusCode.OK, ResponseMessage.FOUND_POST, postInfoDtosImpl);
+    }
+
+    public DefaultResponse<PostDetailsDto> deletePost(Long postId) {
+        Optional<Post> postOptional = postRepository.findById(postId);
+        if (postOptional.isEmpty()) {
+            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_FOUND_POST);
+        }
+        Post post = postOptional.get();
+
+        postImageRepository.deleteAll(post.getImages());
+        postTagRepository.deleteAll(post.getTags());
+        postLikeRepository.deleteAll(post.getPostLikes());
+        replyImageRepository.deleteAll(post.getReplies().stream().flatMap(reply -> reply.getImages().stream()).collect(Collectors.toList()));
+        replyLikeRepository.deleteAll(post.getReplies().stream().flatMap(reply -> reply.getLikes().stream()).collect(Collectors.toList()));
+        replyRepository.deleteAll(post.getReplies());
+        postRepository.delete(post);
+
+        return new DefaultResponse<>(StatusCode.OK, ResponseMessage.DELETED_POST);
     }
 }

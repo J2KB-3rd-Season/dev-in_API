@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -43,7 +45,14 @@ class PostControllerTest {
     @WithMockUser
     void requestPostFailed() throws Exception {
         mvc.perform(get("/postlist/0"))
-                .andExpect(status().is4xxClientError())
+                .andDo(print());
+    }
+
+    @Test
+    @WithMockUser
+    void requestDeleteSucceeded() throws Exception {
+        List<Post> posts = postRepository.findByTitle("title_2");
+        mvc.perform(delete("/post/" + posts.get(0).getId()))
                 .andDo(print());
     }
 }

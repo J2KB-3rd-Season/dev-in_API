@@ -126,7 +126,6 @@ class PostServiceTest {
 
         ReplyOrderCondition replyOrderCondition = new ReplyOrderCondition();
         replyOrderCondition.setLatestDate(true);
-//        replyOrderCondition.setLikeCount(true);
 
         DefaultResponse<PostDetailsDto> response = postService.getPost(post1.getId(), replyOrderCondition);
         assertThat(response.getStatusCode()).isEqualTo(StatusCode.OK);
@@ -136,5 +135,22 @@ class PostServiceTest {
         assertThat(postDto.getTitle()).isEqualTo("PostC1");
         assertThat(postDto.getPublisher_name()).isEqualTo("D");
         assertThat(postDto.getPost_images()).containsExactly("p1","p2","p3");
+    }
+
+    @Test
+    void deleteSucceeded() {
+        Post post1 = new Post(postUser, "PostC1", "ContentC1");
+        List<PostTag> postTags = PostTag.createPostTags(List.of(subject1, subject2));
+        post1.setPostTags(postTags);
+        List<PostImage> postImages = PostImage.createPostImages(List.of("p1", "p2", "p3"));
+        post1.setPostImages(postImages);
+        postTags.forEach(em::persist);
+        postImages.forEach(em::persist);
+        em.persist(post1);
+
+        postService.deletePost(post1.getId());
+
+        Post post = em.find(Post.class, post1.getId());
+        assertThat(post).isNull();
     }
 }
