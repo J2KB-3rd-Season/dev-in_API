@@ -7,8 +7,8 @@ import com.devin.dev.dto.post.PostDetailsDto;
 import com.devin.dev.dto.post.PostInfoDto;
 import com.devin.dev.dto.reply.ReplyLikeDto;
 import com.devin.dev.entity.post.*;
-import com.devin.dev.entity.reply.ReplyLike;
 import com.devin.dev.entity.user.User;
+import com.devin.dev.entity.user.UserStatus;
 import com.devin.dev.model.DefaultResponse;
 import com.devin.dev.repository.post.PostImageRepository;
 import com.devin.dev.repository.post.PostLikeRepository;
@@ -165,7 +165,26 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public DefaultResponse<PostDetailsDto> getPost(Long postId, ReplyOrderCondition replyOrderCondition) {
-        Optional<PostDetailsDto> postOptional = postRepository.findPostDetailsById(postId, replyOrderCondition);
+        Optional<PostDetailsDto> postOptional = postRepository.findPostDetailsByIdWithUserType(postId, replyOrderCondition);
+        if (postOptional.isEmpty()) {
+            return new DefaultResponse<>(StatusCode.NOT_EXIST, ResponseMessage.NOT_FOUND_POST);
+        }
+        PostDetailsDto postDetailsDto = postOptional.get();
+
+        return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.FOUND_POST, postDetailsDto);
+    }
+
+    @Transactional(readOnly = true)
+    public DefaultResponse<PostDetailsDto> getPost(Long postId, ReplyOrderCondition replyOrderCondition, HttpServletRequest request) {
+        String token = tokenProvider.parseToken(request);
+        UserStatus userStatus;
+        if (tokenProvider.validateToken(token)) {
+            userStatus = UserStatus.ACTIVE;
+        } else {
+            userStatus = UserStatus.NON_MEMBERS;
+        }
+
+        Optional<PostDetailsDto> postOptional = postRepository.findPostDetailsByIdWithUserType(postId, userStatus, replyOrderCondition);
         if (postOptional.isEmpty()) {
             return new DefaultResponse<>(StatusCode.NOT_EXIST, ResponseMessage.NOT_FOUND_POST);
         }

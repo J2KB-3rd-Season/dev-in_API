@@ -8,6 +8,7 @@ import com.devin.dev.entity.reply.QReply;
 import com.devin.dev.entity.reply.QReplyImage;
 import com.devin.dev.entity.reply.QReplyLike;
 import com.devin.dev.entity.user.User;
+import com.devin.dev.entity.user.UserStatus;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -122,6 +123,27 @@ public class PostRepositoryQueryImpl implements PostRepositoryQuery {
 
     @Override
     public Optional<PostDetailsDto> findPostDetailsById(Long id, ReplyOrderCondition condition) {
+        Post result = queryFactory
+                .select(post)
+                .from(post)
+                .leftJoin(post.replies, reply).fetchJoin()
+                .leftJoin(post.user, user).fetchJoin()
+                .leftJoin(reply.user, user).fetchJoin()
+                .where(post.id.eq(id))
+                .orderBy(
+                        replyOrder(condition)
+                )
+                .fetchOne();
+
+        Optional<PostDetailsDto> postDetailsDtoOptional;
+
+        postDetailsDtoOptional = result != null ? Optional.of(new PostDetailsDto(result, status)) : Optional.empty();
+
+        return postDetailsDtoOptional;
+    }
+
+    @Override
+    public Optional<PostDetailsDto> findPostDetailsByIdWithUserType(Long id, ReplyOrderCondition condition) {
         Post result = queryFactory
                 .select(post)
                 .from(post)

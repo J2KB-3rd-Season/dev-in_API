@@ -27,14 +27,15 @@ public class PostController {
     @GetMapping("/postlist/{id}")
     public DefaultResponse<PostDetailsDto> getPostDetails(
             @PathVariable("id") Long postId,
-            @RequestParam(defaultValue = "true", name = "sort_reply") boolean sort_reply) {
+            @RequestParam(defaultValue = "true", name = "sort_reply") boolean sort_reply,
+            HttpServletRequest request) {
         ReplyOrderCondition replyOrderCondition = new ReplyOrderCondition();
         if (!sort_reply) {
             replyOrderCondition.setLatestDate(true);
         } else {
             replyOrderCondition.setLikeCount(true);
         }
-        return postService.getPost(postId, replyOrderCondition);
+        return postService.getPost(postId, replyOrderCondition, request);
     }
 
     @GetMapping("/postlist")
