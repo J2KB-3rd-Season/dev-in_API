@@ -34,7 +34,7 @@ public class HelloService {
 
         HelloDto helloDto = new HelloDto(hello);
 
-        return new DefaultResponse<>(StatusCode.OK, ResponseMessage.CREATED_USER, helloDto);
+        return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.CREATED_USER, helloDto);
     }
 
 }

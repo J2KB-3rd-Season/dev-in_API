@@ -2,6 +2,7 @@ package com.devin.dev.entity.post;
 
 import com.devin.dev.entity.base.ModifiedCreated;
 import com.devin.dev.entity.reply.Reply;
+import com.devin.dev.entity.reply.ReplyLike;
 import com.devin.dev.entity.user.User;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -36,7 +37,7 @@ public class Post extends ModifiedCreated {
     private final List<PostTag> tags = new ArrayList<>();
 
     @OneToMany(mappedBy = "post")
-    private final List<PostLike> postLikes = new ArrayList<>();
+    private final List<PostLike> likes = new ArrayList<>();
 
     @OneToMany(mappedBy = "post")
     private final List<PostImage> images = new ArrayList<>();
@@ -105,5 +106,11 @@ public class Post extends ModifiedCreated {
 
     public List<String> getPostTags() {
         return this.tags.stream().map(tag -> tag.getTag().getName()).collect(Collectors.toList());
+    }
+
+    public PostLike like(User user, PostLike postLike) {
+        postLike.changePost(this);
+        postLike.setUser(user);
+        return postLike;
     }
 }

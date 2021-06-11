@@ -53,7 +53,7 @@ class ReplyServiceTest {
 
         DefaultResponse<ReplyDto> response = replyService.reply(replyUser.getId(), post1.getId(),
                 "reply_content", List.of("i1", "i2", "i3"));
-        assertThat(response.getStatusCode()).isEqualTo(StatusCode.OK);
+        assertThat(response.getStatusCode()).isEqualTo(StatusCode.SUCCESS.getCode());
         assertThat(response.getResponseMessage()).isEqualTo(ResponseMessage.REPLY_UPLOAD_SUCCESS);
 
         Reply foundReply = em.find(Reply.class, response.getData().getId());
@@ -81,7 +81,7 @@ class ReplyServiceTest {
 
         DefaultResponse<ReplyDto> response = replyService.reply(-1L, post1.getId(),
                 "reply_content", List.of("i1", "i2", "i3"));
-        assertThat(response.getStatusCode()).isEqualTo(StatusCode.BAD_REQUEST);
+        assertThat(response.getStatusCode()).isEqualTo(StatusCode.NOT_EXIST.getCode());
         assertThat(response.getResponseMessage()).isEqualTo(ResponseMessage.NOT_FOUND_USER);
 
         assertThat(response.getData()).isNull();
@@ -98,7 +98,7 @@ class ReplyServiceTest {
 
         DefaultResponse<ReplyDto> response = replyService.reply(replyUser.getId(), -1L,
                 "reply_content", List.of("i1", "i2", "i3"));
-        assertThat(response.getStatusCode()).isEqualTo(StatusCode.BAD_REQUEST);
+        assertThat(response.getStatusCode()).isEqualTo(StatusCode.NOT_EXIST.getCode());
         assertThat(response.getResponseMessage()).isEqualTo(ResponseMessage.NOT_FOUND_POST);
 
         assertThat(response.getData()).isNull();
@@ -119,7 +119,7 @@ class ReplyServiceTest {
         em.persist(reply);
 
         DefaultResponse<ReplyLikeDto> response = replyService.changeReplyLike(likeUser.getId(), reply.getId());
-        assertThat(response.getStatusCode()).isEqualTo(StatusCode.OK);
+        assertThat(response.getStatusCode()).isEqualTo(StatusCode.SUCCESS.getCode());
         assertThat(response.getResponseMessage()).isEqualTo(ResponseMessage.REPLY_LIKE_CHANGE_SUCCESS);
 
         ReplyLike replyLike = em.find(ReplyLike.class, response.getData().getId());
@@ -162,7 +162,7 @@ class ReplyServiceTest {
 
         // 좋아요 취소 검증
         DefaultResponse<ReplyLikeDto> response = replyService.changeReplyLike(likeUser.getId(), reply.getId());
-        assertThat(response.getStatusCode()).isEqualTo(StatusCode.OK);
+        assertThat(response.getStatusCode()).isEqualTo(StatusCode.SUCCESS.getCode());
         assertThat(response.getResponseMessage()).isEqualTo(ResponseMessage.REPLY_LIKE_CHANGE_SUCCESS);
 
         assertThat(replyLike.getId()).isEqualTo(response.getData().getId());
@@ -203,7 +203,7 @@ class ReplyServiceTest {
 
         DefaultResponse<ReplyDto> response = replyService.editReply(replyUser.getId(), reply.getId(),
                 "edited_content", List.of("i3", "i1", "i2"));
-        assertThat(response.getStatusCode()).isEqualTo(StatusCode.OK);
+        assertThat(response.getStatusCode()).isEqualTo(StatusCode.SUCCESS.getCode());
         assertThat(response.getResponseMessage()).isEqualTo(ResponseMessage.REPLY_EDIT_SUCCESS);
 
         Reply foundReply = em.find(Reply.class, response.getData().getId());
@@ -241,7 +241,7 @@ class ReplyServiceTest {
         // 다른 유저로 댓글 수정 요청, 실패 response 객체 확인
         DefaultResponse<ReplyDto> response = replyService.editReply(postUser.getId(), reply.getId(),
                 "edited_content", List.of("i3", "i1", "i2"));
-        assertThat(response.getStatusCode()).isEqualTo(StatusCode.BAD_REQUEST);
+        assertThat(response.getStatusCode()).isEqualTo(StatusCode.CONDITION_FAIL.getCode());
         assertThat(response.getResponseMessage()).isEqualTo(ResponseMessage.NOT_SAME_USER);
 
         // 안바뀐거 확인
@@ -276,7 +276,7 @@ class ReplyServiceTest {
 
         assertThat(reply.getStatus()).isEqualTo(ReplyStatus.NOT_SELECTED);
         DefaultResponse<?> response = replyService.deleteReply(replyUser.getId(), reply.getId());
-        assertThat(response.getStatusCode()).isEqualTo(StatusCode.OK);
+        assertThat(response.getStatusCode()).isEqualTo(StatusCode.SUCCESS.getCode());
         assertThat(response.getResponseMessage()).isEqualTo(ResponseMessage.REPLY_DELETE_SUCCESS);
 
         Reply foundReply = replyRepository.findById(reply.getId()).get();

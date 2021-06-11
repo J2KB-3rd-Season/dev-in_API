@@ -1,5 +1,6 @@
 package com.devin.dev.controller.reply;
 
+import com.devin.dev.controller.post.ReplyUpdateForm;
 import com.devin.dev.dto.reply.ReplyDto;
 import com.devin.dev.model.DefaultResponse;
 import com.devin.dev.service.ReplyService;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import java.util.List;
@@ -20,16 +22,29 @@ public class ReplyController {
 
     private final ReplyService replyService;
 
-    @PostMapping("/replies")
-    public DefaultResponse<?> saveReply(@RequestBody @Valid CreateReplyRequest request) {
-        return replyService.reply(request.getUserId(), request.getPostId(), request.getContent(), request.getReplyImages());
+    @PostMapping("/reply")
+    public DefaultResponse<?> reply(@RequestBody @Valid ReplyForm form, HttpServletRequest request) {
+        return replyService.reply(form, request);
     }
 
-    @GetMapping("/reply/{id}")
-    public Page<ReplyDto> findReplies(
-            @PathVariable("id") Long postId, Pageable pageable) {
-        DefaultResponse<Page<ReplyDto>> response = replyService.findRepliesInPost(postId, pageable);
-        return response.getData();
+    @PutMapping("/reply/{id}/update")
+    public DefaultResponse<?> editReply(@PathVariable("id") Long replyId, @RequestBody @Valid ReplyUpdateForm form, HttpServletRequest request) {
+        return replyService.editReply(replyId, form, request);
+    }
+
+    @DeleteMapping("/reply/{id}")
+    public DefaultResponse<?> deleteReply(@PathVariable("id") Long replyId, HttpServletRequest request) {
+        return replyService.deleteReply(replyId, request);
+    }
+
+    @PatchMapping("/reply/{id}/like")
+    public DefaultResponse<?> changeReplyLike(@PathVariable("id") Long replyId, HttpServletRequest request) {
+        return replyService.changeReplyLike(replyId, request);
+    }
+
+    @PatchMapping("/reply/{id}/select")
+    public DefaultResponse<?> selectReply(@PathVariable("id") Long replyId, HttpServletRequest request) {
+        return replyService.selectReply(replyId, request);
     }
 
     @Data
@@ -39,18 +54,6 @@ public class ReplyController {
         public CreateReplyResponse(Long id) {
             this.id = id;
         }
-    }
-
-    @Data
-    private static class CreateReplyRequest {
-        @NotEmpty
-        private Long postId;
-        @NotEmpty
-        private Long userId;
-        @NotEmpty
-        private String content;
-        @NotEmpty
-        private List<String> replyImages;
     }
 
     @Data

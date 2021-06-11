@@ -33,7 +33,7 @@ public class UserService {
         // 엔티티 조회
         Optional<User> foundUser = userRepository.findByEmailEquals(userDto.getUserEmail());
         if (foundUser.isPresent()) {
-            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.EXIST_USER_EMAIL);
+            return new DefaultResponse<>(StatusCode.CONDITION_FAIL, ResponseMessage.EXIST_USER_EMAIL);
         }
 
         // 비밀번호 암호화
@@ -47,7 +47,7 @@ public class UserService {
 
         UserDetailsDto userDetailsDto = new UserDetailsDto(user);
 
-        return new DefaultResponse<>(StatusCode.OK, ResponseMessage.CREATED_USER, userDetailsDto);
+        return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.CREATED_USER, userDetailsDto);
     }
 
     @Transactional(readOnly = true)
@@ -55,22 +55,22 @@ public class UserService {
         // DTO email 로 조회
         Optional<UserDetailsDto> userOptional = userRepository.findUserDetailsByEmail(userDto.getUserEmail());
         if (userOptional.isEmpty()) {
-            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_FOUND_EMAIL);
+            return new DefaultResponse<>(StatusCode.NOT_EXIST, ResponseMessage.NOT_FOUND_EMAIL);
         }
         UserDetailsDto userDetailsDto = userOptional.get();
 
         // 비밀번호 체크
         boolean passwordCheck = passwordEncoder.matches(userDto.getUserPassword(), userDetailsDto.getPassword());
         if (!passwordCheck) {
-            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.INCORRECT_PASSWORD);
+            return new DefaultResponse<>(StatusCode.FAIL_AUTH, ResponseMessage.INCORRECT_PASSWORD);
         }
 
         // 활성 유저 체크
         if (userDetailsDto.getStatus() != UserStatus.ACTIVE) {
-            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.INACTIVE_USER);
+            return new DefaultResponse<>(StatusCode.CONDITION_FAIL, ResponseMessage.INACTIVE_USER);
         }
 
-        return new DefaultResponse<>(StatusCode.OK, ResponseMessage.LOGIN_SUCCESS);
+        return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.LOGIN_SUCCESS);
     }
 
     @Transactional
@@ -78,14 +78,14 @@ public class UserService {
         // 엔티티 조회
         Optional<User> userOptional = userRepository.findByEmailEquals(userDto.getUserEmail());
         if (userOptional.isEmpty()) {
-            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_FOUND_USER);
+            return new DefaultResponse<>(StatusCode.NOT_EXIST, ResponseMessage.NOT_FOUND_USER);
         }
         User user = userOptional.get();
 
         // 비밀번호 체크
         boolean passwordCheck = passwordEncoder.matches(userDto.getUserPassword(), user.getPassword());
         if (!passwordCheck) {
-            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.INCORRECT_PASSWORD);
+            return new DefaultResponse<>(StatusCode.FAIL_AUTH, ResponseMessage.INCORRECT_PASSWORD);
         }
 
         // 상태 변경
@@ -93,7 +93,7 @@ public class UserService {
 
         UserDetailsDto userDetailsDto = new UserDetailsDto(user);
 
-        return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.CHANGE_USER_STATUS, userDetailsDto);
+        return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.CHANGE_USER_STATUS, userDetailsDto);
     }
 
     @Transactional
@@ -109,7 +109,7 @@ public class UserService {
     public DefaultResponse<?> join(UserSimpleDto userSimpleDto) {
         userSimpleDto.setUserPassword(passwordEncoder.encode(userSimpleDto.getUserPassword()));
         User user = userRepository.save(new User(userSimpleDto));
-        return new DefaultResponse<>(StatusCode.CREATED, ResponseMessage.CREATED_USER, user.getId());
+        return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.CREATED_USER, user.getId());
     }
 
     @Transactional
@@ -123,7 +123,7 @@ public class UserService {
         }
         JwtAuthToken token = jwtAuthTokenProvider.publishToken(user.getId());
         UserLoginResponseDto responseDto = new UserLoginResponseDto(user, token);
-        return new DefaultResponse<>(StatusCode.OK, ResponseMessage.LOGIN_SUCCESS, responseDto);
+        return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.LOGIN_SUCCESS, responseDto);
     }
 
     public User findUserByEmail(String email) {

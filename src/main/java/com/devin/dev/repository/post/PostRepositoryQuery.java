@@ -7,6 +7,7 @@ import com.devin.dev.dto.post.PostInfoDto;
 import com.devin.dev.dto.post.PostSimpleDto;
 import com.devin.dev.entity.post.Post;
 import com.devin.dev.entity.user.User;
+import com.devin.dev.entity.user.UserStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -23,5 +24,7 @@ public interface PostRepositoryQuery {
 
     Page<Post> findAllByTagId(Long id, Pageable pageable);
 
-    Optional<PostDetailsDto> findPostDetailsById(Long id, ReplyOrderCondition condition);
+    Optional<PostDetailsDto> findPostDetailsByIdWithUserType(Long id, UserStatus status, ReplyOrderCondition condition);
+
+    Optional<PostDetailsDto> findPostDetailsByIdWithUserType(Long id, ReplyOrderCondition condition);
 }
