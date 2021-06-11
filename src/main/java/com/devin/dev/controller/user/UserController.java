@@ -20,45 +20,45 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService userService;
-
-    @GetMapping("/login")
-    public String getLoginForm() {
-        return "loginPage";
-    }
-
-    @GetMapping("/signUp")
-    public String getSignUpForm() {
-        return "signupPage";
-    }
-
-    @PostMapping("/signUp")
-    public String signUp(@Valid UserSimpleDto form, BindingResult result) {
-
-        System.out.println("form = " + form);
-
-        if (result.hasErrors()) {
-            return "redirect:/";
-        }
-
-
-        userService.signUp(form);
-
-        return "redirect:/";
-    }
-
-    @GetMapping("/")
-    public String getIndex(Model model) {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String username;
-        if (principal instanceof UserDetails) {
-            username = ((UserDetails) principal).getUsername();
-        } else {
-            username = principal.toString();
-        }
-        model.addAttribute("username", username);
-
-        return "index";
-    }
+//    private final UserService userService;
+//
+//    @GetMapping("/login")
+//    public String getLoginForm() {
+//        return "loginPage";
+//    }
+//
+//    @GetMapping("/signUp")
+//    public String getSignUpForm() {
+//        return "signupPage";
+//    }
+//
+//    @PostMapping("/signUp")
+//    public String signUp(@Valid UserSimpleDto form, BindingResult result) {
+//
+//        System.out.println("form = " + form);
+//
+//        if (result.hasErrors()) {
+//            return "redirect:/";
+//        }
+//
+//
+//        userService.signUp(form);
+//
+//        return "redirect:/";
+//    }
+//
+//    @GetMapping("/")
+//    public String getIndex(Model model) {
+//        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        String username;
+//        if (principal instanceof UserDetails) {
+//            username = ((UserDetails) principal).getUsername();
+//        } else {
+//            username = principal.toString();
+//        }
+//        model.addAttribute("username", username);
+//
+//        return "index";
+//    }
 
 }

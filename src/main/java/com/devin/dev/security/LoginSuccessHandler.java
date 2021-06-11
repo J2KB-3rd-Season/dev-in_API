@@ -14,9 +14,5 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         HttpSession session = request.getSession();
-
-        session.setAttribute("greeting", "welcome " + authentication.getName());
-        System.out.println("session.getAttribute(\"greeting\") = " + session.getAttribute("greeting"));
-        response.sendRedirect("/");
     }
 }
