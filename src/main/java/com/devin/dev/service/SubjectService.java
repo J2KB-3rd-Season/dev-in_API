@@ -79,4 +79,32 @@ public class SubjectService {
 
         return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.DELETE_SUBJECT);
     }
+
+    @Transactional
+    public DefaultResponse<?> removeSubject(SubjectForm form, HttpServletRequest request) {
+        String token = tokenProvider.parseToken(request);
+        Long userId;
+        if (tokenProvider.validateToken(token)) {
+            userId = tokenProvider.getUserId(token);
+        } else {
+            return new DefaultResponse<>(StatusCode.FAIL_AUTH, ResponseMessage.NOT_FOUND_USER);
+        }
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            return new DefaultResponse<>(StatusCode.NOT_EXIST, ResponseMessage.NOT_FOUND_USER);
+        }
+        User user = userOptional.get();
+
+        if (user.getStatus() != UserStatus.ADMIN) {
+            return new DefaultResponse<>(StatusCode.CONDITION_FAIL, ResponseMessage.NO_AUTHORITY);
+        }
+
+        List<Subject> subjects = subjectRepository.findByNameIn(form.getSubjects());
+        if (subjects.isEmpty()) {
+            return new DefaultResponse<>(StatusCode.NOT_EXIST, ResponseMessage.NOT_FOUND_SUBJECT);
+        }
+        subjectRepository.deleteAll(subjects);
+
+        return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.DELETE_SUBJECT);
+    }
 }
