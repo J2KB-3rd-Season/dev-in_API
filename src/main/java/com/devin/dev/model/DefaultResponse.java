@@ -10,18 +10,18 @@ import lombok.Getter;
 @Getter
 public class DefaultResponse<T> {
 
-    private final StatusCode statusCode;
+    private final int statusCode;
     private final ResponseMessage responseMessage;
     private final T data;
 
     public DefaultResponse(StatusCode statusCode, ResponseMessage responseMessage) {
-        this.statusCode = statusCode;
+        this.statusCode = statusCode.getCode();
         this.responseMessage = responseMessage;
         this.data = null;
     }
 
     public DefaultResponse(StatusCode statusCode, ResponseMessage responseMessage, T data) {
-        this.statusCode = statusCode;
+        this.statusCode = statusCode.getCode();
         this.responseMessage = responseMessage;
         this.data = data;
     }

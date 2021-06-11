@@ -21,23 +21,23 @@ public class SubjectService {
     public DefaultResponse<?> addSubject(String name) {
         Optional<Subject> subjectOptional = subjectRepository.findByName(name);
         if (subjectOptional.isPresent()) {
-            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.EXIST_SUBJECT);
+            return new DefaultResponse<>(StatusCode.CONDITION_FAIL, ResponseMessage.EXIST_SUBJECT);
         }
         Subject subject = new Subject(name);
 
         subjectRepository.save(subject);
 
-        return new DefaultResponse<>(StatusCode.OK, ResponseMessage.CREATED_SUBJECT);
+        return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.CREATED_SUBJECT);
     }
 
     @Transactional
     public DefaultResponse<?> removeSubject(String name) {
         Optional<Subject> subjectOptional = subjectRepository.findByName(name);
         if (subjectOptional.isEmpty()) {
-            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_FOUND_SUBJECT);
+            return new DefaultResponse<>(StatusCode.NOT_EXIST, ResponseMessage.NOT_FOUND_SUBJECT);
         }
         subjectRepository.delete(subjectOptional.get());
 
-        return new DefaultResponse<>(StatusCode.OK, ResponseMessage.DELETE_SUBJECT);
+        return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.DELETE_SUBJECT);
     }
 }

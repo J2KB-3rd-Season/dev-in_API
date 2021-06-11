@@ -42,7 +42,7 @@ class UserServiceTest {
 
         // 성공 response 객체 확인
         assertThat(response.getResponseMessage()).isEqualTo(ResponseMessage.CREATED_USER);
-        assertThat(response.getStatusCode()).isEqualTo(StatusCode.OK);
+        assertThat(response.getStatusCode()).isEqualTo(StatusCode.SUCCESS.getCode());
 
         // 저장된 유저 엔티티 확인
         Optional<User> foundUser = userRepository.findByEmailEquals("a@b.com");
@@ -71,7 +71,7 @@ class UserServiceTest {
 
         // 실패 response 객체 확인
         assertThat(response.getResponseMessage()).isEqualTo(ResponseMessage.EXIST_USER_EMAIL);
-        assertThat(response.getStatusCode()).isEqualTo(StatusCode.BAD_REQUEST);
+        assertThat(response.getStatusCode()).isEqualTo(StatusCode.CONDITION_FAIL.getCode());
 
         Optional<User> foundUser = userRepository.findByName("B");
         assertThat(foundUser.isEmpty()).isTrue();
@@ -95,7 +95,7 @@ class UserServiceTest {
         System.out.println("response = " + response.getResponseMessage());
         // 성공 response 객체 확인
         assertThat(response.getResponseMessage()).isEqualTo(ResponseMessage.LOGIN_SUCCESS);
-        assertThat(response.getStatusCode()).isEqualTo(StatusCode.OK);
+        assertThat(response.getStatusCode()).isEqualTo(StatusCode.SUCCESS.getCode());
     }
 
     @Test
@@ -116,7 +116,7 @@ class UserServiceTest {
 
         // 실패 response 객체 확인
         assertThat(response.getResponseMessage()).isEqualTo(ResponseMessage.NOT_FOUND_EMAIL);
-        assertThat(response.getStatusCode()).isEqualTo(StatusCode.BAD_REQUEST);
+        assertThat(response.getStatusCode()).isEqualTo(StatusCode.NOT_EXIST.getCode());
     }
 
     @Test
@@ -136,6 +136,6 @@ class UserServiceTest {
 
         // 실패 response 객체 확인
         assertThat(response.getResponseMessage()).isEqualTo(ResponseMessage.INCORRECT_PASSWORD);
-        assertThat(response.getStatusCode()).isEqualTo(StatusCode.BAD_REQUEST);
+        assertThat(response.getStatusCode()).isEqualTo(StatusCode.FAIL_AUTH.getCode());
     }
 }

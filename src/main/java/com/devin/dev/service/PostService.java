@@ -5,7 +5,9 @@ import com.devin.dev.controller.post.PostSearchCondition;
 import com.devin.dev.controller.reply.ReplyOrderCondition;
 import com.devin.dev.dto.post.PostDetailsDto;
 import com.devin.dev.dto.post.PostInfoDto;
+import com.devin.dev.dto.reply.ReplyLikeDto;
 import com.devin.dev.entity.post.*;
+import com.devin.dev.entity.reply.ReplyLike;
 import com.devin.dev.entity.user.User;
 import com.devin.dev.model.DefaultResponse;
 import com.devin.dev.repository.post.PostImageRepository;
@@ -49,19 +51,19 @@ public class PostService {
     private final JwtAuthTokenProvider tokenProvider;
 
     @Transactional
-    public DefaultResponse<?> post(HttpServletRequest request, PostForm form) {
+    public DefaultResponse<?> post(PostForm form, HttpServletRequest request) {
         String token = tokenProvider.parseToken(request);
         Long userId;
         if (tokenProvider.validateToken(token)) {
             userId = tokenProvider.getUserId(token);
         } else {
-            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_FOUND_USER);
+            return new DefaultResponse<>(StatusCode.FAIL_AUTH, ResponseMessage.NOT_FOUND_USER);
         }
 
         // 엔티티 조회. 실패시 에러코드 반환
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty()) {
-            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_FOUND_USER);
+            return new DefaultResponse<>(StatusCode.NOT_EXIST, ResponseMessage.NOT_FOUND_USER);
         }
         User user = userOptional.get();
         List<Subject> postSubjects = subjectRepository.findByNameIn(form.getPost_tags());
@@ -82,7 +84,7 @@ public class PostService {
         PostDetailsDto postDetailsDto = new PostDetailsDto(post);
 
         // 성공 메시지 및 코드 반환
-        return new DefaultResponse<>(StatusCode.OK, ResponseMessage.POST_UPLOAD_SUCCESS, postDetailsDto);
+        return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.POST_UPLOAD_SUCCESS, postDetailsDto);
     }
 
     @Transactional
@@ -90,7 +92,7 @@ public class PostService {
         // 엔티티 조회. 실패시 에러코드 반환
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty()) {
-            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_FOUND_USER);
+            return new DefaultResponse<>(StatusCode.NOT_EXIST, ResponseMessage.NOT_FOUND_USER);
         }
         User user = userOptional.get();
         List<Subject> postSubjects = subjectRepository.findByNameIn(tags);
@@ -111,7 +113,7 @@ public class PostService {
         PostDetailsDto postDto = new PostDetailsDto(post);
 
         // 성공 메시지 및 코드 반환
-        return new DefaultResponse<>(StatusCode.OK, ResponseMessage.POST_UPLOAD_SUCCESS, postDto);
+        return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.POST_UPLOAD_SUCCESS, postDto);
     }
 
     // 게시글 수정
@@ -120,11 +122,11 @@ public class PostService {
         // 엔티티 조회. 실패시 에러코드 반환
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty()) {
-            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_FOUND_USER);
+            return new DefaultResponse<>(StatusCode.NOT_EXIST, ResponseMessage.NOT_FOUND_USER);
         }
         Optional<Post> postOptional = postRepository.findById(postId);
         if (postOptional.isEmpty()) {
-            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_FOUND_POST);
+            return new DefaultResponse<>(StatusCode.NOT_EXIST, ResponseMessage.NOT_FOUND_POST);
         }
         Post post = postOptional.get();
         List<Subject> postSubjects = subjectRepository.findByNameIn(tags);
@@ -158,54 +160,55 @@ public class PostService {
         postTagRepository.saveAll(newPostTags);
 
         // 성공 메시지 및 코드 반환
-        return new DefaultResponse<>(StatusCode.OK, ResponseMessage.POST_EDIT_SUCCESS);
+        return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.POST_EDIT_SUCCESS);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public DefaultResponse<PostDetailsDto> getPost(Long postId, ReplyOrderCondition replyOrderCondition) {
         Optional<PostDetailsDto> postOptional = postRepository.findPostDetailsById(postId, replyOrderCondition);
         if (postOptional.isEmpty()) {
-            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_FOUND_POST);
+            return new DefaultResponse<>(StatusCode.NOT_EXIST, ResponseMessage.NOT_FOUND_POST);
         }
         PostDetailsDto postDetailsDto = postOptional.get();
 
-        return new DefaultResponse<>(StatusCode.OK, ResponseMessage.FOUND_POST, postDetailsDto);
+        return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.FOUND_POST, postDetailsDto);
     }
 
     // 게시글 검색
-    @Transactional
+    @Transactional(readOnly = true)
     public DefaultResponse<Page<PostInfoDto>> getPostInfoListByCondition(PostSearchCondition condition, Pageable pageable) {
         Page<PostInfoDto> postDtos = postRepository.findPostInfoDtoPageByCondition(condition, pageable);
 
         PageImpl<PostInfoDto> page = new PageImpl<>(postDtos.toList(), pageable, postDtos.getTotalElements());
 
-        return new DefaultResponse<>(StatusCode.OK, ResponseMessage.FOUND_POST, page);
+        return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.FOUND_POST, page);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public DefaultResponse<Page<PostInfoDto>> getPostInfoList(Long id, Pageable pageable) {
         Page<Post> posts =  (id > 0)? postRepository.findAllByTagId(id, pageable) : postRepository.findAll(pageable);
         Page<PostInfoDto> postInfoDtos = posts.map(PostInfoDto::new);
         PageImpl<PostInfoDto> postInfoDtosImpl = new PageImpl<>(postInfoDtos.toList(), pageable, postInfoDtos.getTotalElements());
-        return new DefaultResponse<>(StatusCode.OK, ResponseMessage.FOUND_POST, postInfoDtosImpl);
+        return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.FOUND_POST, postInfoDtosImpl);
     }
 
+    @Transactional
     public DefaultResponse<PostDetailsDto> deletePost(Long postId) {
         Optional<Post> postOptional = postRepository.findById(postId);
         if (postOptional.isEmpty()) {
-            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_FOUND_POST);
+            return new DefaultResponse<>(StatusCode.NOT_EXIST, ResponseMessage.NOT_FOUND_POST);
         }
         Post post = postOptional.get();
 
         postImageRepository.deleteAll(post.getImages());
         postTagRepository.deleteAll(post.getTags());
-        postLikeRepository.deleteAll(post.getPostLikes());
+        postLikeRepository.deleteAll(post.getLikes());
         replyImageRepository.deleteAll(post.getReplies().stream().flatMap(reply -> reply.getImages().stream()).collect(Collectors.toList()));
         replyLikeRepository.deleteAll(post.getReplies().stream().flatMap(reply -> reply.getLikes().stream()).collect(Collectors.toList()));
         replyRepository.deleteAll(post.getReplies());
         postRepository.delete(post);
 
-        return new DefaultResponse<>(StatusCode.OK, ResponseMessage.DELETED_POST);
+        return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.DELETED_POST);
     }
 }
 

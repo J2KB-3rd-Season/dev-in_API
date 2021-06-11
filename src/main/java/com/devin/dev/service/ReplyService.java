@@ -43,13 +43,13 @@ public class ReplyService {
         // 엔티티 조회. 실패시 response 인스턴스 반환
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty()) {
-            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_FOUND_USER);
+            return new DefaultResponse<>(StatusCode.NOT_EXIST, ResponseMessage.NOT_FOUND_USER);
         }
         User user = userOptional.get();
         
         Optional<Post> postOptional = postRepository.findById(postId);
         if (postOptional.isEmpty()) {
-            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_FOUND_POST);
+            return new DefaultResponse<>(StatusCode.NOT_EXIST, ResponseMessage.NOT_FOUND_POST);
         }
         Post post = postOptional.get();
 
@@ -70,7 +70,7 @@ public class ReplyService {
         ReplyDto replyDto = ReplyMapper.replyToReplyDto(reply);
 
         // response 객체 리턴
-        return new DefaultResponse<>(StatusCode.OK, ResponseMessage.REPLY_UPLOAD_SUCCESS, replyDto);
+        return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.REPLY_UPLOAD_SUCCESS, replyDto);
     }
 
     // 답변 수정
@@ -79,18 +79,18 @@ public class ReplyService {
         // 엔티티 조회. 실패시 response 인스턴스 반환
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty()) {
-            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_FOUND_USER);
+            return new DefaultResponse<>(StatusCode.NOT_EXIST, ResponseMessage.NOT_FOUND_USER);
         }
         User user = userOptional.get();
 
         Optional<Reply> replyOptional = replyRepository.findById(replyId);
         if (replyOptional.isEmpty()) {
-            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_FOUND_REPLY);
+            return new DefaultResponse<>(StatusCode.NOT_EXIST, ResponseMessage.NOT_FOUND_REPLY);
         }
         Reply reply = replyOptional.get();
 
         if (isNotSameUser(user, reply.getUser())) {
-            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_SAME_USER);
+            return new DefaultResponse<>(StatusCode.CONDITION_FAIL, ResponseMessage.NOT_SAME_USER);
         }
 
         // 기존 이미지 경로 삭제
@@ -110,7 +110,7 @@ public class ReplyService {
         ReplyDto replyDto = ReplyMapper.replyToReplyDto(reply);
 
         // response 객체 리턴
-        return new DefaultResponse<>(StatusCode.OK, ResponseMessage.REPLY_EDIT_SUCCESS, replyDto);
+        return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.REPLY_EDIT_SUCCESS, replyDto);
     }
 
     // 좋아요 상태변경
@@ -119,13 +119,13 @@ public class ReplyService {
         // 엔티티 조회. 실패시 response 인스턴스 반환
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty()) {
-            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_FOUND_USER);
+            return new DefaultResponse<>(StatusCode.NOT_EXIST, ResponseMessage.NOT_FOUND_USER);
         }
         User user = userOptional.get();
 
         Optional<Reply> replyOptional = replyRepository.findById(replyId);
         if (replyOptional.isEmpty()) {
-            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_FOUND_REPLY);
+            return new DefaultResponse<>(StatusCode.NOT_EXIST, ResponseMessage.NOT_FOUND_REPLY);
         }
         Reply reply = replyOptional.get();
 
@@ -156,7 +156,7 @@ public class ReplyService {
 
         ReplyLikeDto replyLikeDto = new ReplyLikeDto(replyLike.getId(), user.getName());
 
-        return new DefaultResponse<>(StatusCode.OK, ResponseMessage.REPLY_LIKE_CHANGE_SUCCESS, replyLikeDto);
+        return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.REPLY_LIKE_CHANGE_SUCCESS, replyLikeDto);
     }
 
     @Transactional
@@ -164,24 +164,24 @@ public class ReplyService {
         // 엔티티 조회. 실패시 response 인스턴스 반환
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty()) {
-            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_FOUND_USER);
+            return new DefaultResponse<>(StatusCode.NOT_EXIST, ResponseMessage.NOT_FOUND_USER);
         }
         User user = userOptional.get();
 
         Optional<Reply> replyOptional = replyRepository.findById(replyId);
         if (replyOptional.isEmpty()) {
-            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_FOUND_REPLY);
+            return new DefaultResponse<>(StatusCode.NOT_EXIST, ResponseMessage.NOT_FOUND_REPLY);
         }
         Reply reply = replyOptional.get();
 
         // 작성자 확인
         if (isNotSameUser(user, reply.getUser())) {
-            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.NOT_SAME_USER);
+            return new DefaultResponse<>(StatusCode.CONDITION_FAIL, ResponseMessage.NOT_SAME_USER);
         }
 
         // 채택된 답변인지 확인
         if (reply.getStatus() == ReplyStatus.SELECTED) {
-            return new DefaultResponse<>(StatusCode.BAD_REQUEST, ResponseMessage.CANNOT_DELETE_SELECTED);
+            return new DefaultResponse<>(StatusCode.CONDITION_FAIL, ResponseMessage.CANNOT_DELETE_SELECTED);
         }
 
         // 리플 작성자 경험치 삭제
@@ -191,7 +191,7 @@ public class ReplyService {
         reply.setStatus(ReplyStatus.DELETED);
         replyRepository.save(reply);
 
-        return new DefaultResponse<>(StatusCode.OK, ResponseMessage.REPLY_DELETE_SUCCESS);
+        return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.REPLY_DELETE_SUCCESS);
     }
 
     @Transactional(readOnly = true)
@@ -200,7 +200,7 @@ public class ReplyService {
         List<ReplyDto> replyDtos = ReplyMapper.toDtos(replies.toList());
 
         PageImpl<ReplyDto> page = new PageImpl<>(replyDtos, pageable, replies.getTotalElements());
-        return new DefaultResponse<>(StatusCode.OK, ResponseMessage.FOUND_POST, page);
+        return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.FOUND_POST, page);
     }
     
     private boolean isNotSameUser(User firstUser, User secondUser) {
