@@ -342,4 +342,55 @@ public class ReplyService {
 
         return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.REPLY_DELETE_SUCCESS);
     }
+
+    @Transactional
+    public DefaultResponse<ReplyDto> changeReplyLike(Long replyId, HttpServletRequest request) {
+        String token = tokenProvider.parseToken(request);
+        Long userId;
+        if (tokenProvider.validateToken(token)) {
+            userId = tokenProvider.getUserId(token);
+        } else {
+            return new DefaultResponse<>(StatusCode.FAIL_AUTH, ResponseMessage.NOT_FOUND_USER);
+        }
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            return new DefaultResponse<>(StatusCode.NOT_EXIST, ResponseMessage.NOT_FOUND_USER);
+        }
+        User user = userOptional.get();
+
+        Optional<Reply> replyOptional = replyRepository.findById(replyId);
+        if (replyOptional.isEmpty()) {
+            return new DefaultResponse<>(StatusCode.NOT_EXIST, ResponseMessage.NOT_FOUND_REPLY);
+        }
+        Reply reply = replyOptional.get();
+
+        // 추천 조회
+        Optional<ReplyLike> likeOptional = replyRepository.findLikeByUser(reply, user);
+
+        ReplyLike replyLike;
+        // 추천 유무에 따라 실행
+        if (likeOptional.isPresent()) {
+            replyLike = likeOptional.get();
+            replyLikeRepository.delete(replyLike);
+            if (isNotSameUser(user, reply.getUser())) {
+                // 좋아요 누른 사람 경험치 감소
+                user.changeExp(User.ExpChangeType.REPLY_CANCEL_LIKE);
+                // 답변 작성자 경험치 감소
+                reply.getUser().changeExp(User.ExpChangeType.REPLY_NOT_BE_LIKED);
+            }
+        } else {
+            replyLike = reply.like(user, new ReplyLike());
+            if (isNotSameUser(user, reply.getUser())) {
+                // 좋아요 누른 사람 경험치 증가
+                user.changeExp(User.ExpChangeType.REPLY_LIKE);
+                // 답변 작성자 경험치 증가
+                reply.getUser().changeExp(User.ExpChangeType.REPLY_BE_LIKED);
+            }
+            replyLikeRepository.save(replyLike);
+        }
+
+        ReplyDto replyDto = new ReplyDto(reply);
+
+        return new DefaultResponse<>(StatusCode.SUCCESS, ResponseMessage.REPLY_LIKE_CHANGE_SUCCESS, replyDto);
+    }
 }

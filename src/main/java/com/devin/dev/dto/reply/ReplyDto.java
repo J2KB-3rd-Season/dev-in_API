@@ -1,5 +1,6 @@
 package com.devin.dev.dto.reply;
 
+import com.devin.dev.entity.reply.Reply;
 import com.devin.dev.entity.reply.ReplyImage;
 import com.devin.dev.entity.reply.ReplyStatus;
 import com.devin.dev.entity.user.UserStatus;
@@ -33,4 +34,11 @@ public class ReplyDto {
         this.like = like;
     }
 
+    public ReplyDto(Reply reply) {
+        this.id = reply.getId();
+        this.name = reply.getUser().getName();
+        this.content = reply.getContent();
+        this.status = reply.getStatus();
+        this.like = reply.getLikes().size();
+    }
 }

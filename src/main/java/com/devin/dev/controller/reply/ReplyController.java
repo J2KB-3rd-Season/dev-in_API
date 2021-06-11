@@ -37,6 +37,11 @@ public class ReplyController {
         return replyService.deleteReply(replyId, request);
     }
 
+    @PatchMapping("/reply/{id}/like")
+    public DefaultResponse<?> changePostLike(@PathVariable("id") Long replyId, HttpServletRequest request) {
+        return replyService.changeReplyLike(replyId, request);
+    }
+
     @Data
     private static class CreateReplyResponse {
         private Long id;
