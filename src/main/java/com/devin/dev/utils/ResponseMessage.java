@@ -22,6 +22,7 @@ public enum ResponseMessage {
     POST_UPLOAD_SUCCESS("게시글 등록 성공"),
     POST_EDIT_SUCCESS("게시글 수정 성공"),
     DELETED_POST("게시글 삭제 성공"),
+    SELECTED_POST("채택된 게시글"),
     REPLY_UPLOAD_SUCCESS("답변 등록 성공"),
     REPLY_EDIT_SUCCESS("답변 수정 성공"),
     REPLY_DELETE_SUCCESS("답변 삭제 성공"),

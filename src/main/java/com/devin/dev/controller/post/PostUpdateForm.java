@@ -9,14 +9,12 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class PostUpdateForm {
-    private Long id;
     private String title;
     private String content;
-    private List<String> post_images = new ArrayList<>();
-    private List<String> post_tags = new ArrayList<>();
+    private List<String> post_images;
+    private List<String> post_tags;
 
     public PostUpdateForm(Long id, String title, String content, List<String> post_images, List<String> post_tags) {
-        this.id = id;
         this.title = title;
         this.content = content;
         this.post_images = post_images;

@@ -221,6 +221,10 @@ public class PostService {
         }
         Post post = postOptional.get();
 
+        if (post.getStatus() == PostStatus.SELECTED) {
+            return new DefaultResponse<>(StatusCode.CONDITION_FAIL, ResponseMessage.SELECTED_POST);
+        }
+
         postImageRepository.deleteAll(post.getImages());
         postTagRepository.deleteAll(post.getTags());
         postLikeRepository.deleteAll(post.getLikes());
@@ -304,6 +308,11 @@ public class PostService {
             return new DefaultResponse<>(StatusCode.NOT_EXIST, ResponseMessage.NOT_FOUND_POST);
         }
         Post post = postOptional.get();
+
+        if (post.getStatus() == PostStatus.SELECTED) {
+            return new DefaultResponse<>(StatusCode.CONDITION_FAIL, ResponseMessage.SELECTED_POST);
+        }
+
         List<Subject> postSubjects = subjectRepository.findByNameIn(form.getPost_tags());
 
         // 기존 태그 및 이미지 경로 삭제
