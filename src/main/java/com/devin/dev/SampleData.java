@@ -60,7 +60,7 @@ public class SampleData implements CommandLineRunner {
         for (UserDetailsDto userDto : userDtos) {
             for (PostDetailsDto postDto : postDtos) {
                 for (int i = 0; i < 2; i++) {
-                    DefaultResponse<ReplyDto> response = replyService.reply(userDto.getId(), postDto.getPostId(),
+                    DefaultResponse<ReplyDto> response = replyService.reply(userDto.getId(), postDto.getPost_id(),
                             "reply_content_" + i,
                             List.of("reply_img_1", "reply_img_2", "reply_img_3"));
                     replyDtos.add(response.getData());
